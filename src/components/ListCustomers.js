@@ -10,13 +10,49 @@ export default class ListCustomers extends Component {
         this.state = {
             customerslist: [],
             selectedIds: [],
-            amount: 0
+            amount: 0,
+            merchantsList: [],
+            selectedMerchant: ""
         }
         this.makeRequest = this.makeRequest.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.createGroup = this.createGroup.bind(this);
         this.handleClickAmount = this.handleClickAmount.bind(this);
+        this.makeMerchantRequest = this.makeMerchantRequest.bind(this);
+        this.handleClickMerchant = this.handleClickMerchant.bind(this);
+        this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
     }
+
+    async componentDidMount() {
+        await this.makeMerchantRequest();
+    }
+
+    async makeMerchantRequest() {
+        console.log("Inside makemerchant");
+        const headers = {
+            "Content-Type": `application/json`
+        };
+
+        const request = {
+            baseURL: "http://127.0.0.1:8000/getMerchant/",
+            headers,
+            method: 'get',
+        };
+        const response = await axios(request);
+        console.log(response.data)
+        var responsecustomers = []
+        response.data.forEach(element => {
+            var customer = element
+            if (customer.ewallet != "") {
+                responsecustomers.push(customer)
+            }
+        });
+
+        this.setState({ merchantsList: responsecustomers }, () => {
+            console.log("merchant = ", this.state.merchantsList)
+        })
+    }
+
     async makeRequest() {
         const headers = {
             "Content-Type": `application/json`
@@ -27,18 +63,11 @@ export default class ListCustomers extends Component {
             headers,
             method: 'get',
         };
-
-        // You can use any HTTP request library to make the request. Example: Axios
         const response = await axios(request);
         console.log(response.data)
-        // for (var ele in response.data['data']){
-        //     var customer = ele
-        //     this.state.customerslist.push(customer)
-        // }
         var responsecustomers = []
         response.data['data'].forEach(element => {
             var customer = element
-            // console.log(responsecustomers)
             if (customer.ewallet != "") {
                 responsecustomers.push(customer)
             }
@@ -49,13 +78,15 @@ export default class ListCustomers extends Component {
         })
     }
 
-    createGroup = async() => {
+    createGroup = async () => {
+        var totalCustomerCount = this.state.selectedIds.length + 1;
+        var finalamount = this.state.amount - ((this.state.amount)/(totalCustomerCount))
         var gpbody = {
-            amount :this.state.amount.toString(),
-            ids : this.state.selectedIds
+            amount: finalamount.toString(),
+            ids: this.state.selectedIds
         }
 
-        console.log("finalbody is ",gpbody);
+        console.log("finalbody is ", gpbody);
         const headers = {
             "Content-Type": `application/json`
         };
@@ -71,6 +102,29 @@ export default class ListCustomers extends Component {
         console.log(response.data)
     }
 
+
+    makePaymentEwallet = async () => {
+        var ewalletpaymentbody = {
+            amount: this.state.amount.toString(),
+            ids: this.state.selectedMerchant
+        }
+
+        console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
+        const headers = {
+            "Content-Type": `application/json`
+        };
+
+        const request = {
+            baseURL: "http://127.0.0.1:8000/accountTransfer/",
+            headers,
+            data: ewalletpaymentbody,
+            method: 'post',
+        };
+
+        const response = await axios(request);
+        console.log(response.data)
+    }
+
     handleChange = (e) => {
         const { value, checked } = e.target;
         var presentIds = this.state.selectedIds;
@@ -78,7 +132,6 @@ export default class ListCustomers extends Component {
         if (checked) {
             presentIds = [...presentIds, value]
         } else {
-            // remove unchecked value from the list
             presentIds = presentIds.filter(x => x !== value)
         }
         console.log("present ids are ", presentIds);
@@ -94,8 +147,47 @@ export default class ListCustomers extends Component {
         console.log('handleClick 👉️', this.state.amount);
     }
 
+    handleClickMerchant = (e) => {
+        e.preventDefault();
+        console.log(e.target.value);
+        this.setState({
+            selectedMerchant: e.target.value
+        }, () => (console.log('merchantClick 👉️', this.state.selectedMerchant)))
+    }
+
     render() {
         console.log(this.state.customerslist);
+        let merchants;
+        let clickedMerchant;
+        let makePaymentEwallet;
+        if (this.state.selectedMerchant == "") {
+            clickedMerchant = "";
+            console.log("inside render for merhcant ", this.state.merchantsList);
+            merchants = <ul>
+                {this.state.merchantsList.map((merchant) => <label key={merchant.ewallet}>
+                    <input
+                        type="radio"
+                        name="lang"
+                        value={merchant.ewallet}
+                        onChange={this.handleClickMerchant}
+                    /> {merchant.name}
+                </label>)}
+            </ul>
+        }
+        else {
+            clickedMerchant = <div>
+                <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    onChange={this.handleClickAmount}
+                    autoComplete="off"
+                />
+
+                <h2>Amount: {this.state.amount}</h2>
+            </div>
+        }
+
         let button;
         if (this.state.selectedIds.length > 0) {
             button = <button onClick={this.createGroup}> Create Group </button>;
@@ -118,27 +210,18 @@ export default class ListCustomers extends Component {
                 <div>{button}</div>
             </div>
         }
-        return (
-
-            <div>
+        if (this.state.amount > 0 && this.state.selectedIds.length > 0 && this.state.selectedMerchant != ""){
+            makePaymentEwallet = <button onClick={this.makePaymentEwallet} label="Make Payment to Merchant">Make Payment to Merchant</button>
+        }
+            return (
 
                 <div>
-                    <input
-                        type="number"
-                        id="amount"
-                        name="amount"
-                        onChange={this.handleClickAmount}
-                        autoComplete="off"
-                    />
+                    {merchants}
+                    {clickedMerchant}
+                    {finalamount}
+                    {makePaymentEwallet}
 
-                    <h2>Amount: {this.state.amount}</h2>
-
-                    {/* <button onClick={this.handleClickAmount}>Click</button> */}
                 </div>
-                {/* <div>{this.state.customerslist}</div> */}
-                {finalamount}
-
-            </div>
-        )
+            )
     }
 }
