@@ -1,18 +1,20 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
+import ModalPopup from '../Models/modal-popup';
 import CryptoJS from 'crypto-js'
 import axios from "axios";
+import 'react-bootstrap';
 
 export default class ListCustomers extends Component {
-
     constructor(props) {
         super(props);
-
         this.state = {
             customerslist: [],
             selectedIds: [],
             amount: 0,
             merchantsList: [],
-            selectedMerchant: ""
+            selectedMerchant: "",
+            showModalPopup: false,
+            pendingResponse :{}
         }
         this.makeRequest = this.makeRequest.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -21,8 +23,12 @@ export default class ListCustomers extends Component {
         this.makeMerchantRequest = this.makeMerchantRequest.bind(this);
         this.handleClickMerchant = this.handleClickMerchant.bind(this);
         this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
+        this.isShowPopup = this.isShowPopup.bind(this);
     }
 
+    isShowPopup = (status) => {
+        this.setState({ showModalPopup: status });
+    };
     async componentDidMount() {
         await this.makeMerchantRequest();
     }
@@ -59,7 +65,7 @@ export default class ListCustomers extends Component {
         };
 
         const request = {
-            baseURL: "http://127.0.0.1:8000/countries/",
+            baseURL: "http://127.0.0.1:8000/customers/",
             headers,
             method: 'get',
         };
@@ -80,7 +86,7 @@ export default class ListCustomers extends Component {
 
     createGroup = async () => {
         var totalCustomerCount = this.state.selectedIds.length + 1;
-        var finalamount = this.state.amount - ((this.state.amount)/(totalCustomerCount))
+        var finalamount = this.state.amount - ((this.state.amount) / (totalCustomerCount))
         var gpbody = {
             amount: finalamount.toString(),
             ids: this.state.selectedIds
@@ -92,7 +98,7 @@ export default class ListCustomers extends Component {
         };
 
         const request = {
-            baseURL: "http://127.0.0.1:8000/createPayment/",
+            baseURL: "http://127.0.0.1:8000/createGruopPayment/",
             headers,
             data: gpbody,
             method: 'post',
@@ -123,6 +129,12 @@ export default class ListCustomers extends Component {
 
         const response = await axios(request);
         console.log(response.data)
+        this.setState({pendingResponse : response.data},()=>{
+            console.log(this.state.pendingResponse);
+        })
+        if(response.status = 200){
+            this.isShowPopup(true)
+        }
     }
 
     handleChange = (e) => {
@@ -210,11 +222,11 @@ export default class ListCustomers extends Component {
                 <div>{button}</div>
             </div>
         }
-        if (this.state.amount > 0 && this.state.selectedIds.length > 0 && this.state.selectedMerchant != ""){
+        if (this.state.amount > 0 && this.state.selectedIds.length > 0 && this.state.selectedMerchant != "") {
             makePaymentEwallet = <button onClick={this.makePaymentEwallet} label="Make Payment to Merchant">Make Payment to Merchant</button>
         }
-            return (
-
+        return (
+            <div>
                 <div>
                     {merchants}
                     {clickedMerchant}
@@ -222,6 +234,26 @@ export default class ListCustomers extends Component {
                     {makePaymentEwallet}
 
                 </div>
-            )
+                <div>
+                    <Fragment>
+                        <h3 align="center">Demo of Modal Pop up in Reactjs</h3>
+                        <header align="center">
+                            <Fragment>
+                                <div
+                                    className="nav-item"
+                                    onClick={() => this.isShowPopup(true)}>
+                                    <button>Modal Pop up</button>
+                                </div>
+                            </Fragment>
+                        </header>
+                        <ModalPopup
+                            showModalPopup={this.state.showModalPopup}
+                            onPopupClose={this.isShowPopup}
+                            pendingResponse = {this.state.pendingResponse}
+                        ></ModalPopup>
+                    </Fragment>
+                </div>
+            </div>
+        )
     }
 }
