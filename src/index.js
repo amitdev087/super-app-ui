@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { Routes, Route, Link, BrowserRouter as Router } from 'react-router-dom'
 import Make_payment from './components/MakePayments';
 import ListCustomers from './components/ListCustomers';
+import SplitIt from './components/splitIt';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -14,6 +15,7 @@ root.render(
       <Routes>
         <Route path="/" element={<Make_payment/>}></Route>
         <Route path="/listcustomers" element={<ListCustomers/>}></Route>
+        <Route path="/splitIt" element={<SplitIt/>}></Route>
       </Routes>
     </Router>
   // </React.StrictMode>

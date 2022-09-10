@@ -3,6 +3,8 @@ import ModalPopup from '../Models/modal-popup';
 import CryptoJS from 'crypto-js'
 import axios from "axios";
 import 'react-bootstrap';
+import SplitIt from './splitIt';
+import { Link } from 'react-router-dom'
 
 export default class ListCustomers extends Component {
     constructor(props) {
@@ -14,7 +16,7 @@ export default class ListCustomers extends Component {
             merchantsList: [],
             selectedMerchant: "",
             showModalPopup: false,
-            pendingResponse :{}
+            pendingResponse: {}
         }
         this.makeRequest = this.makeRequest.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -129,10 +131,10 @@ export default class ListCustomers extends Component {
 
         const response = await axios(request);
         console.log(response.data)
-        this.setState({pendingResponse : response.data},()=>{
+        this.setState({ pendingResponse: response.data }, () => {
             console.log(this.state.pendingResponse);
         })
-        if(response.status = 200){
+        if (response.status = 200) {
             this.isShowPopup(true)
         }
     }
@@ -249,9 +251,19 @@ export default class ListCustomers extends Component {
                         <ModalPopup
                             showModalPopup={this.state.showModalPopup}
                             onPopupClose={this.isShowPopup}
-                            pendingResponse = {this.state.pendingResponse}
+                            pendingResponse={this.state.pendingResponse}
                         ></ModalPopup>
                     </Fragment>
+                </div>
+                <div>
+                    <Link to={{
+                        pathname: "/splitIt"
+                    }}>
+                        Go to SplitIt
+                    </Link>
+                    {/* <SplitIt>
+                        customerslist = {this.state.customerslist}
+                    </SplitIt> */}
                 </div>
             </div>
         )
