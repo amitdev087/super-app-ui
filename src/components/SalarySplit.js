@@ -218,6 +218,7 @@ export default class SalarySplit extends Component {
           <input
             type="number"
             id="amount"
+            min={0}
             name="amountTotal"
             onChange={this.handleClickAmount}
             autoComplete="off"
