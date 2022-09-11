@@ -344,6 +344,7 @@ export default class ListCustomers extends Component {
                             showModalPopup={this.state.showModalPopup}
                             onPopupClose={this.isShowPopup}
                             pendingResponse={this.state.pendingResponse}
+                            pathURL = "http://127.0.0.1:8000/setTransferResponse/"
                         ></ModalPopup>
                     </Fragment>
                 </div>

@@ -31,7 +31,7 @@ class ModalPopup extends Component {
             "Content-Type": `application/json`
         };
         const request = {
-            baseURL: "http://127.0.0.1:8000/setTransferResponse/",
+            baseURL: this.props.pathURL,
             headers,
             data: this.props.pendingResponse,
             method: 'post',
