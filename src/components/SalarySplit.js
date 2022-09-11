@@ -113,7 +113,7 @@ export default class SalarySplit extends Component {
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
-      if (customer.ewallet != "") {
+      if (customer.ewallet != "" && customer.id != "cus_5dedc9d323b7928b256317886173bbca") {
         responsecustomers.push(customer);
       }
     });
