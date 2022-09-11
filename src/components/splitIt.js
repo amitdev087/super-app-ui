@@ -15,8 +15,14 @@ export default class SplitIt extends Component {
             showModalPopup: false,
             pendingResponse: {},
             transactionList: [],
-            owesYou:""
+            owesYou:"",
+            owingOption:1
+            // you owe people - split equally -- 1
+            // people owe you - split equally -- 2
+            // you owe people full amount -- 3
+            // people owe you full amount -- 4
         }
+        
 
         this.handleChange = this.handleChange.bind(this);
         this.createSplit = this.createSplit.bind(this);
@@ -26,6 +32,12 @@ export default class SplitIt extends Component {
         this.checkOwes = this.checkOwes.bind(this);
         this.showName = this.showName.bind(this);
     }
+    owingList = [
+        "paid by you split equally",
+        "paid by people split equally",
+        "paid by someone, you owe full amount",
+        "paid by you take full amount"
+    ]
 
     componentDidMount() {
         this.getTransactions();
@@ -93,8 +105,20 @@ export default class SplitIt extends Component {
     }
 
     createSplit = async () => {
+        var owingOption = this.state.owingOption;
         var totalCustomerCount = this.state.selectedIds.length + 1;
-        var individualAmount = ((this.state.amount) / (totalCustomerCount))
+        if(owingOption == 1 ){
+            var individualAmount = ((this.state.amount) / (totalCustomerCount))
+        }
+        else if(owingOption == 2){
+            var individualAmount = -((this.state.amount) / (totalCustomerCount))
+        }
+        else if(owingOption == 3){
+            var individualAmount = -(this.state.amount)
+        }
+        else{
+            var individualAmount = (this.state.amount)
+        }
         var finalbody = [];
 
         this.state.selectedIds.forEach((x) => {
@@ -140,6 +164,15 @@ export default class SplitIt extends Component {
             selectedIds: presentIds
         })
     }
+
+    handleClickOwingOption = (e) => {
+        e.preventDefault();
+        console.log(e.target.value);
+        this.setState({
+            owingOption: e.target.value
+        }, () => (console.log('owing option is 👉️', this.state.owingOption)))
+    }
+
     handleClickAmount = (e) => {
         e.preventDefault();
         this.setState({
@@ -150,14 +183,10 @@ export default class SplitIt extends Component {
 
     checkOwes(sentAmount){
         if(parseInt(sentAmount)>0){
-            // this.setState({
             return  " owes you "
-            // })
         }
         else{
-            // this.setState({
             return " is owed "
-            // })
         }
     }
 
@@ -179,8 +208,23 @@ export default class SplitIt extends Component {
                             value={transaction.source}
                             onChange={this.handleChange}
                         > 
-                        <p>{transaction.name} {this.checkOwes(transaction.amount)} {transaction.amount} USD</p>
+                        <p>{transaction.name} {this.checkOwes(transaction.amount)} {Math.abs(transaction.amount.toFixed(2))} USD</p>
                         </li>
+                    </label>)}
+                </ul>
+
+
+                <div>select SPlIT Type</div>
+                <ul>
+                    {this.owingList.map((opt,idx) => <label key={idx+1}>
+                        <input
+                            type="radio"
+                            name="lang"
+                            value={idx+1}
+                            onChange={this.handleClickOwingOption}
+                        > 
+                        </input>
+                        <p> {opt} </p>
                     </label>)}
                 </ul>
                 {/* <div>{button}</div> */}

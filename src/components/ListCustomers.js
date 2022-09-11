@@ -261,9 +261,13 @@ export default class ListCustomers extends Component {
                     }}>
                         Go to SplitIt
                     </Link>
-                    {/* <SplitIt>
-                        customerslist = {this.state.customerslist}
-                    </SplitIt> */}
+                </div>
+                <div>
+                    <Link to={{
+                        pathname: "/salarySplit"
+                    }}>
+                        Go to Salary Split
+                    </Link>
                 </div>
             </div>
         )

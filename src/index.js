@@ -7,6 +7,7 @@ import { Routes, Route, Link, BrowserRouter as Router } from 'react-router-dom'
 import Make_payment from './components/MakePayments';
 import ListCustomers from './components/ListCustomers';
 import SplitIt from './components/splitIt';
+import SalarySplit from './components/SalarySplit';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,6 +17,7 @@ root.render(
         <Route path="/" element={<Make_payment/>}></Route>
         <Route path="/listcustomers" element={<ListCustomers/>}></Route>
         <Route path="/splitIt" element={<SplitIt/>}></Route>
+        <Route path="/salarySplit" element={<SalarySplit/>}></Route>
       </Routes>
     </Router>
   // </React.StrictMode>
