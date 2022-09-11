@@ -17,18 +17,18 @@ export default class SalarySplit extends Component {
       showModalPopup: false,
       pendingResponse: {},
     };
-    this.makeRequest = this.makeRequest.bind(this);
+   this.makeRequest = this.makeRequest.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.createSalaryGroup = this.createSalaryGroup.bind(this);
     this.handleClickAmount = this.handleClickAmount.bind(this);
-    this.makeMerchantRequest = this.makeMerchantRequest.bind(this);
-    this.handleClickMerchant = this.handleClickMerchant.bind(this);
-    this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
+   // this.makeMerchantRequest = this.makeMerchantRequest.bind(this);
+    //this.handleClickMerchant = this.handleClickMerchant.bind(this);
+    //this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
     this.isShowPopup = this.isShowPopup.bind(this);
   }
   owingList = ["Split Salary Equally", "Pay Salary Indiviually "];
   handleClickOwingOption = (e) => {
-    e.preventDefault();
+    //e.preventDefault();
     console.log(e.target.value);
     this.setState(
       {
@@ -37,9 +37,10 @@ export default class SalarySplit extends Component {
       () => console.log("owing option is 👉️", this.state.owingOption)
     );
   };
+
   createSalaryGroup = async () => {
     var owingOption = this.state.owingOption;
-    var totalCustomerCount = this.state.selectedIds.length ;
+    var totalCustomerCount = this.state.selectedIds.length;
     if (owingOption == 1) {
       var individualAmount = this.state.amount / totalCustomerCount;
     } else {
@@ -50,17 +51,6 @@ export default class SalarySplit extends Component {
       amount: individualAmount.toString(),
       ids: this.state.selectedIds,
     };
-    // this.state.selectedIds.forEach((x) => {
-    //   var name = this.showName(x);
-    //   console.log("SHow name is ***********", name);
-    //   var individualBody = {
-    //     source: x,
-    //     amount: individualAmount.toString(),
-    //     destination: "cus_79737ddadfa895a92de55d311b496cc2",
-    //     name: this.showName(x),
-    //   };
-    //   finalbody.push(individualBody);
-    // });
     console.log("finalbody is ", gpbody);
     const headers = {
       "Content-Type": `application/json`,
@@ -73,44 +63,40 @@ export default class SalarySplit extends Component {
       method: "post",
     };
     const response = await axios(request);
-    // console.log(response.data);
-    // if (response.status == 201) {
-    //   await this.getTransactions();
-    // }
   };
 
   isShowPopup = (status) => {
     this.setState({ showModalPopup: status });
   };
   async componentDidMount() {
-    await this.makeMerchantRequest();
+    //await this.makeMerchantRequest();
   }
 
-  async makeMerchantRequest() {
-    console.log("Inside makemerchant");
-    const headers = {
-      "Content-Type": `application/json`,
-    };
+  // async makeMerchantRequest() {
+  //   console.log("Inside makemerchant");
+  //   const headers = {
+  //     "Content-Type": `application/json`,
+  //   };
 
-    const request = {
-      baseURL: "http://127.0.0.1:8000/getMerchant/",
-      headers,
-      method: "get",
-    };
-    const response = await axios(request);
-    console.log(response.data);
-    var responsecustomers = [];
-    response.data.forEach((element) => {
-      var customer = element;
-      if (customer.ewallet != "") {
-        responsecustomers.push(customer);
-      }
-    });
+  //   const request = {
+  //     baseURL: "http://127.0.0.1:8000/getMerchant/",
+  //     headers,
+  //     method: "get",
+  //   };
+  //   const response = await axios(request);
+  //   console.log(response.data);
+  //   var responsecustomers = [];
+  //   response.data.forEach((element) => {
+  //     var customer = element;
+  //     if (customer.ewallet != "") {
+  //       responsecustomers.push(customer);
+  //     }
+  //   });
 
-    this.setState({ merchantsList: responsecustomers }, () => {
-      console.log("merchant = ", this.state.merchantsList);
-    });
-  }
+  //   this.setState({ merchantsList: responsecustomers }, () => {
+  //     console.log("merchant = ", this.state.merchantsList);
+  //   });
+  // }
 
   async makeRequest() {
     const headers = {
@@ -137,58 +123,33 @@ export default class SalarySplit extends Component {
     });
   }
 
-  // createSalaryGroup = async () => {
-  //   var totalCustomerCount = this.state.selectedIds.length + 1;
-  //   var finalamount =
-  //     this.state.amount - this.state.amount / totalCustomerCount;
-  //   var gpbody = {
-  //     amount: finalamount.toString(),
-  //     ids: this.state.selectedIds,
+  // makePaymentEwallet = async () => {
+  //   var ewalletpaymentbody = {
+  //     amount: this.state.amount.toString(),
+  //     ids: this.state.selectedMerchant,
   //   };
 
-  //   console.log("finalbody is ", gpbody);
+  //   console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
   //   const headers = {
   //     "Content-Type": `application/json`,
   //   };
 
   //   const request = {
-  //     baseURL: "http://127.0.0.1:8000/createSalaryPayment/",
+  //     baseURL: "http://127.0.0.1:8000/accountTransfer/",
   //     headers,
-  //     data: gpbody,
+  //     data: ewalletpaymentbody,
   //     method: "post",
   //   };
 
   //   const response = await axios(request);
   //   console.log(response.data);
+  //   this.setState({ pendingResponse: response.data }, () => {
+  //     console.log(this.state.pendingResponse);
+  //   });
+  //   if ((response.status = 200)) {
+  //     this.isShowPopup(true);
+  //   }
   // };
-
-  makePaymentEwallet = async () => {
-    var ewalletpaymentbody = {
-      amount: this.state.amount.toString(),
-      ids: this.state.selectedMerchant,
-    };
-
-    console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
-    const headers = {
-      "Content-Type": `application/json`,
-    };
-
-    const request = {
-      baseURL: "http://127.0.0.1:8000/accountTransfer/",
-      headers,
-      data: ewalletpaymentbody,
-      method: "post",
-    };
-
-    const response = await axios(request);
-    console.log(response.data);
-    this.setState({ pendingResponse: response.data }, () => {
-      console.log(this.state.pendingResponse);
-    });
-    if ((response.status = 200)) {
-      this.isShowPopup(true);
-    }
-  };
 
   handleChange = (e) => {
     const { value, checked } = e.target;
@@ -204,6 +165,7 @@ export default class SalarySplit extends Component {
       selectedIds: presentIds,
     });
   };
+
   handleClickAmount = (e) => {
     e.preventDefault();
     this.setState({
@@ -212,27 +174,27 @@ export default class SalarySplit extends Component {
     console.log("handleClick 👉️", this.state.amount);
   };
 
-  handleClickMerchant = (e) => {
-    e.preventDefault();
-    console.log(e.target.value);
-    this.setState(
-      {
-        selectedMerchant: e.target.value,
-      },
-      () => console.log("merchantClick 👉️", this.state.selectedMerchant)
-    );
-  };
+  // handleClickMerchant = (e) => {
+  //   e.preventDefault();
+  //   console.log(e.target.value);
+  //   this.setState(
+  //     {
+  //       selectedMerchant: e.target.value,
+  //     },
+  //     () => console.log("merchantClick 👉️", this.state.selectedMerchant)
+  //   );
+  // };
 
   render() {
-    console.log(this.state.customerslist);
-    let merchants;
+    //console.log(this.state.customerslist);
+    //let merchants;
     let clickedMerchant;
     let makePaymentEwallet;
     let transactionsSplit;
     {
       transactionsSplit = (
         <div>
-          <div>select SPlIT Type</div>
+          <div>Select Split Type</div>
           <ul>
             {this.owingList.map((opt, idx) => (
               <label key={idx + 1}>
