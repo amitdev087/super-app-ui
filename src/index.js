@@ -8,6 +8,7 @@ import Make_payment from './components/MakePayments';
 import ListCustomers from './components/ListCustomers';
 import SplitIt from './components/splitIt';
 import SalarySplit from './components/SalarySplit';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
