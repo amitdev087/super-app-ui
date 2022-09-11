@@ -19,7 +19,9 @@ export default class SplitIt extends Component {
             transactionList: [],
             owesYou: "",
             owingOption: 1,
-            showTransaction: false
+            showTransaction: false,
+            showModalPopup:false,
+            settleUpConfirmBody:{}
             // you owe people - split equally -- 1
             // people owe you - split equally -- 2
             // you owe people full amount -- 3
@@ -33,8 +35,10 @@ export default class SplitIt extends Component {
         this.getTransactions = this.getTransactions.bind(this);
         this.makeRequest = this.makeRequest.bind(this);
         this.checkOwes = this.checkOwes.bind(this);
+        this.handlesettleUp = this.handlesettleUp.bind(this);
         this.showName = this.showName.bind(this);
         this.handleShowTransactions = this.handleShowTransactions.bind(this);
+        this.isShowPopup = this.isShowPopup.bind(this);
     }
     owingList = [
         "paid by you split equally",
@@ -43,6 +47,9 @@ export default class SplitIt extends Component {
         "paid by you take full amount"
     ]
 
+    isShowPopup = (status) => {
+        this.setState({ showModalPopup: status });
+    };
     componentDidMount() {
         this.getTransactions();
         this.makeRequest();
@@ -99,7 +106,47 @@ export default class SplitIt extends Component {
     }
 
 
-    showName(x) {
+    async settleup(finalbody){
+        console.log("finalbody is ", finalbody);
+        const headers = {
+            "Content-Type": `application/json`
+        };
+
+        const request = {
+            baseURL: "http://127.0.0.1:8000/settleUp/",
+            headers,
+            data: finalbody,
+            method: 'post',
+        }
+        const response = await axios(request);
+        if (response.status = 201) {
+            this.isShowPopup(true)
+        }
+
+        finalbody["id"]=response.data["id"]
+        this.settleUpConfirmBody=finalbody
+        // console.log(finalbody,"final body for settle up confirmation")
+        // const newrequest= {
+        //     baseURL: "http://127.0.0.1:8000/settleUpConfirm/",
+        //     headers,
+        //     data: finalbody,
+        //     method: 'post',
+        // };
+        // const response1 = await axios(newrequest);
+
+    }
+    handlesettleUp= (e) => {
+        //const { value, checked } = e.target;
+        console.log(e.target.value)
+        var data=e.target.value
+        data = this.state.transactionList.filter((x)=>x.source ==  data)
+        var finalData=data[0]
+        console.log(finalData)
+        this.settleup(finalData);
+       // console.log(checked,"inside handleSettle")
+    }
+
+    showName = (x)=> {
         var custDetails = this.state.customerslist
         for (var ele in custDetails) {
             if (custDetails[ele].id == x) {
@@ -202,6 +249,8 @@ export default class SplitIt extends Component {
         }
     }
 
+  
+
 
     render() {
         console.log(this.state.customerslist);
@@ -226,6 +275,8 @@ export default class SplitIt extends Component {
                             onChange={this.handleChange}
                         >
                             <p className='p'><strong>{transaction.name}</strong> {this.checkOwes(transaction.amount)} {Math.abs(transaction.amount.toFixed(2))} USD</p>
+
+                            <button className='button_primary' value={transaction.source} onClick={this.handlesettleUp}>settleUp</button>
                         </li>
                     )}
                 </ul>
@@ -287,6 +338,27 @@ export default class SplitIt extends Component {
                     <button className='button_primary' onClick={this.handleShowTransactions}>{!this.state.showTransaction ? "View Transactions" : "Hide Transactions"}</button>
                     {transactionsSplit}
 
+                </div>
+                <div>
+                    <Fragment>
+                        <h3 align="center">Demo of Modal Pop up in Reactjs</h3>
+                        <header align="center">
+                            <Fragment>
+                                <div
+                                    className="nav-item"
+                                    onClick={() => this.isShowPopup(true)}>
+                                    <button>Modal Pop up</button>
+                                </div>
+                            </Fragment>
+                        </header>
+                        <ModalPopup
+                            showModalPopup={this.state.showModalPopup}
+                            onPopupClose={this.isShowPopup}
+                            pendingResponse={this.settleUpConfirmBody}
+                            pathURL = "http://127.0.0.1:8000/settleUpConfirm/"
+
+                        ></ModalPopup>
+                    </Fragment>
                 </div>
                 <div>
                 </div>
