@@ -5,6 +5,7 @@ import axios from "axios";
 import "react-bootstrap";
 import SplitIt from "./splitIt";
 import { Link } from "react-router-dom";
+import '../styles/salarySplit.css'
 export default class SalarySplit extends Component {
   constructor(props) {
     super(props);
@@ -69,7 +70,7 @@ export default class SalarySplit extends Component {
     this.setState({ showModalPopup: status });
   };
   async componentDidMount() {
-    //await this.makeMerchantRequest();
+    await this.makeRequest();
   }
 
   // async makeMerchantRequest() {
@@ -193,53 +194,56 @@ export default class SalarySplit extends Component {
     let transactionsSplit;
     {
       transactionsSplit = (
-        <div>
-          <div>Select Split Type</div>
-          <ul>
-            {this.owingList.map((opt, idx) => (
-              <label key={idx + 1}>
-                <input
-                  type="radio"
-                  name="lang"
-                  value={idx + 1}
-                  onChange={this.handleClickOwingOption}
-                ></input>
-                <p> {opt} </p>
-              </label>
-            ))}
-          </ul>
+        <div className='transaction_list_wrapper' style={{padding:'2px',textAlign:"center"}}>
+          <div  >Select Split Type</div>
+          <select className='dropdown_splitoption'  onChange={this.handleClickOwingOption}>
+                {this.owingList.map((opt, idx) =>
+                    <option
+                    className='dropdown_splitoption'
+                        key={opt}
+                        type="radio"
+                        name="lang"
+                        value={idx + 1}
+                        >
+                            {opt}
+                    </option>
+                )}
+            </select>
         </div>
       );
     }
     {
       clickedMerchant = (
-        <div>
+        <div className='form-group' style={{marginTop:"15"}}>
           <input
             type="number"
             id="amount"
-            name="amount"
+            name="amountTotal"
             onChange={this.handleClickAmount}
             autoComplete="off"
+            className="form-control"
+            placeholder='Enter Amount'
           />
-          <h2>Amount: {this.state.amount}</h2>
+          {/* <h2>Amount: {this.state.amount}</h2> */}
         </div>
       );
     }
 
     let button;
     if (this.state.selectedIds.length > 0) {
-      button = <button onClick={this.createSalaryGroup}> Create Group </button>;
+      button = <button className='button_primary' onClick={this.createSalaryGroup}> Pay Salaries </button>;
     }
     console.log("button value is :", this.state.selectedIds > 0);
     let finalamount;
     if (this.state.amount > 0) {
       finalamount = (
-        <div>
-          <div>ListCustomers</div>
-          <button onClick={this.makeRequest} label="Get customers">
-            Get customers
-          </button>
-          <ul>
+        <div className='transaction_list_wrapper'>
+          {/* <div>ListCustomers</div> */}
+        
+            
+          <h5>Select Employe's</h5>
+          <hr></hr>
+          <ul className='grid_listcustomers'>
             {this.state.customerslist.map((customer) => (
               <label key={customer.id}>
                 <input
@@ -271,7 +275,7 @@ export default class SalarySplit extends Component {
       );
     }
     return (
-      <div>
+      <div  className='container' style={{ padding: '2rem', width: '60%' }}>
         <div>
           {/* {merchants} */}
           {transactionsSplit}
