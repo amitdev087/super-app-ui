@@ -5,7 +5,8 @@ import axios from "axios";
 import "react-bootstrap";
 import SplitIt from "./splitIt";
 import { Link } from "react-router-dom";
-import '../styles/salarySplit.css'
+import "../styles/salarySplit.css";
+import LoadingSpinner from "./LoadingSpinner";
 export default class SalarySplit extends Component {
   constructor(props) {
     super(props);
@@ -17,12 +18,16 @@ export default class SalarySplit extends Component {
       selectedMerchant: "",
       showModalPopup: false,
       pendingResponse: {},
+      isLoading: false,
+      buttonEnable: true,
+      responseMessage: "",
     };
-   this.makeRequest = this.makeRequest.bind(this);
+    this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
+    this.makeRequest = this.makeRequest.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.createSalaryGroup = this.createSalaryGroup.bind(this);
     this.handleClickAmount = this.handleClickAmount.bind(this);
-   // this.makeMerchantRequest = this.makeMerchantRequest.bind(this);
+    // this.makeMerchantRequest = this.makeMerchantRequest.bind(this);
     //this.handleClickMerchant = this.handleClickMerchant.bind(this);
     //this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
     this.isShowPopup = this.isShowPopup.bind(this);
@@ -40,6 +45,15 @@ export default class SalarySplit extends Component {
   };
 
   createSalaryGroup = async () => {
+    this.setState({
+      isLoading: true,
+      buttonEnable: false,
+    });
+    console.log("inside create salary grpu[");
+    console.log(
+      this.state.isLoading,
+      "isloading  gggggggggggggggggggggggggggggggg"
+    );
     var owingOption = this.state.owingOption;
     var totalCustomerCount = this.state.selectedIds.length;
     if (owingOption == 1) {
@@ -64,6 +78,17 @@ export default class SalarySplit extends Component {
       method: "post",
     };
     const response = await axios(request);
+    if (response.status == 201) {
+      this.setState({
+        isLoading: false,
+        responseMessage: "Salaries Paid",
+      });
+    } else {
+      this.setState({
+        isLoading: false,
+        responseMessage: "failed to pay the salary",
+      });
+    }
   };
 
   isShowPopup = (status) => {
@@ -114,14 +139,24 @@ export default class SalarySplit extends Component {
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
-      if (customer.ewallet != "" && customer.id != "cus_5dedc9d323b7928b256317886173bbca") {
+      if (
+        customer.ewallet != "" &&
+        customer.id != "cus_5dedc9d323b7928b256317886173bbca"
+      ) {
         responsecustomers.push(customer);
       }
     });
 
-    this.setState({ customerslist: responsecustomers }, () => {
-      console.log("csutomers = ", this.state.customerslist);
-    });
+    this.setState(
+      {
+        customerslist: responsecustomers.filter((x) =>
+          x.id != this.FailedUser
+        ),
+      },
+      () => {
+        console.log("csutomers = ", this.state.customerslist);
+      }
+    );
   }
 
   // makePaymentEwallet = async () => {
@@ -194,27 +229,33 @@ export default class SalarySplit extends Component {
     let transactionsSplit;
     {
       transactionsSplit = (
-        <div className='transaction_list_wrapper' style={{padding:'2px',textAlign:"center"}}>
-          <div  >Select Split Type</div>
-          <select className='dropdown_splitoption'  onChange={this.handleClickOwingOption}>
-                {this.owingList.map((opt, idx) =>
-                    <option
-                    className='dropdown_splitoption'
-                        key={opt}
-                        type="radio"
-                        name="lang"
-                        value={idx + 1}
-                        >
-                            {opt}
-                    </option>
-                )}
-            </select>
+        <div
+          className="transaction_list_wrapper"
+          style={{ padding: "2px", textAlign: "center" }}
+        >
+          <div>Select Split Type</div>
+          <select
+            className="dropdown_splitoption"
+            onChange={this.handleClickOwingOption}
+          >
+            {this.owingList.map((opt, idx) => (
+              <option
+                className="dropdown_splitoption"
+                key={opt}
+                type="radio"
+                name="lang"
+                value={idx + 1}
+              >
+                {opt}
+              </option>
+            ))}
+          </select>
         </div>
       );
     }
     {
       clickedMerchant = (
-        <div className='form-group' style={{marginTop:"15"}}>
+        <div className="form-group" style={{ marginTop: "15" }}>
           <input
             type="number"
             id="amount"
@@ -223,7 +264,7 @@ export default class SalarySplit extends Component {
             onChange={this.handleClickAmount}
             autoComplete="off"
             className="form-control"
-            placeholder='Enter Amount'
+            placeholder="Enter Amount"
           />
           {/* <h2>Amount: {this.state.amount}</h2> */}
         </div>
@@ -232,19 +273,23 @@ export default class SalarySplit extends Component {
 
     let button;
     if (this.state.selectedIds.length > 0) {
-      button = <button className='button_primary' onClick={this.createSalaryGroup}> Pay Salaries </button>;
+      button = (
+        <button className="button_primary" onClick={this.createSalaryGroup}>
+          {" "}
+          Pay Salaries{" "}
+        </button>
+      );
     }
     console.log("button value is :", this.state.selectedIds > 0);
     let finalamount;
     if (this.state.amount > 0) {
       finalamount = (
-        <div className='transaction_list_wrapper'>
+        <div className="transaction_list_wrapper">
           {/* <div>ListCustomers</div> */}
-        
-            
+
           <h5>Select Employe's</h5>
           <hr></hr>
-          <ul className='grid_listcustomers'>
+          <ul className="grid_listcustomers">
             {this.state.customerslist.map((customer) => (
               <label key={customer.id}>
                 <input
@@ -276,13 +321,26 @@ export default class SalarySplit extends Component {
       );
     }
     return (
-      <div  className='container' style={{ padding: '2rem', width: '60%' }}>
+      <div className="container" style={{ padding: "2rem", width: "60%" }}>
         <div>
-          {/* {merchants} */}
-          {transactionsSplit}
-          {clickedMerchant}
-          {finalamount}
-          {makePaymentEwallet}
+          <div disabled={!this.state.buttonEnable}>
+            {transactionsSplit}
+            {clickedMerchant}
+            {finalamount}
+          </div>
+
+          {this.state.responseMessage != "" || this.state.isLoading == true ? (
+            <div className="transaction_list_wrapper">
+              {this.state.isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <p>{this.state.responseMessage}</p>
+              )}
+            </div>
+          ) : (
+            <div></div>
+          )}
+          {/* {makePaymentEwallet} */}
         </div>
       </div>
     );
