@@ -36,8 +36,7 @@ class ListCustomers extends Component {
       buttonEnable: true,
       responseMessage: "",
       merchantPaymentStarted: false,
-      payToMerchantButtpn:true
-
+      payToMerchantButtpn: true,
     };
 
     this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
@@ -240,8 +239,7 @@ class ListCustomers extends Component {
   makePaymentEwallet = async () => {
     this.setState({
       merchantPaymentStarted: true,
-      payToMerchantButtpn:false
-
+      payToMerchantButtpn: false,
     });
     var ewalletpaymentbody = {
       amount: this.state.amount.toString(),
@@ -344,11 +342,11 @@ class ListCustomers extends Component {
     if (
       this.state.amount > 0 &&
       this.state.selectedIds.length > 0 &&
-      this.state.selectedMerchant != "" 
- 
+      this.state.selectedMerchant != ""
     ) {
       makePaymentEwallet = (
-        <button disabled={ ! this.state.payToMerchantButtpn }
+        <button
+          disabled={!this.state.payToMerchantButtpn}
           className="button_primary"
           onClick={this.makePaymentEwallet}
           label="Make Payment to Merchant"
@@ -419,20 +417,21 @@ class ListCustomers extends Component {
       );
     }
     let button;
-    if (this.state.selectedIds.length > 0) {
-      button = (
-        <button
-          className="button_primary"
-          onClick={this.createGroup}
-          disabled={!isMerchantSelected}
-        >
-          {" "}
-          {isMerchantSelected
-            ? "Create Group Payment"
-            : "Please select merchant"}{" "}
-        </button>
-      );
-    }
+    // if (this.state.selectedIds.length > 2) {
+    button = (
+      <button
+        className="button_primary"
+        onClick={this.createGroup}
+        disabled={!isMerchantSelected}
+      >
+        {isMerchantSelected && this.state.selectedIds.length > 2
+          ? "Create Group Payment"
+          : this.state.selectedIds.length < 3
+          ? "Please select atleast 3 friends"
+          : "Please select merchant "}
+      </button>
+    );
+    // }
     console.log("button value is :", this.state.selectedIds > 0);
     let finalamount;
     if (this.state.amount > 0) {
