@@ -22,11 +22,11 @@ class SplitIt extends Component {
       transactionList: [],
       owesYou: "",
       owingOption: 1,
-      showTransaction: false,
+      showTransaction: true,
       showModalPopup: false,
       settleUpConfirmBody: {},
       isLoading: false,
-      buttonEnable: false,
+      buttonEnable: true,
       responseMessage: "",
       // you owe people - split equally -- 1
       // people owe you - split equally -- 2
@@ -388,10 +388,12 @@ class SplitIt extends Component {
     return (
       <div className="container" style={{ padding: "2rem", width: "60%" }}>
         <div>
+        <div disabled={!this.state.buttonEnable}>
           {clickedMerchant}
           {splitType}
           {merchants}
           {finalamount}
+          </div>
           {this.state.responseMessage != "" || this.state.isLoading == true ? (
             <div className="transaction_list_wrapper">
               {this.state.isLoading ? (
