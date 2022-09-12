@@ -46,9 +46,9 @@ class ModalPopup extends Component {
         console.log(response.data)
         if(response.status == 201 || response.status == 200){
             this.getTransactions()
-            this.props.updateCompletedMerchantPayment(true);
+            this.props.updateCompletedMerchantPayment([true,"Payment Succeeded"]);
         }else{
-            this.props.updateCompletedMerchantPayment(false);
+            this.props.updateCompletedMerchantPayment([false,"Payment Failed"]);
         }
     }
   
