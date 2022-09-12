@@ -5,12 +5,14 @@ import axios from "axios";
 import { Button } from 'react-bootstrap';
 import 'react-bootstrap';
 import '../styles/splitit.css'
+import { connect } from 'react-redux'
+import { updateTransaction } from '../Redux/Actions/TransactionsActions';
 
-
-export default class SplitIt extends Component {
+class SplitIt extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            transactionGlobal: [],
             customerslist: [],
             selectedIds: [],
             amount: 0,
@@ -20,8 +22,8 @@ export default class SplitIt extends Component {
             owesYou: "",
             owingOption: 1,
             showTransaction: false,
-            showModalPopup:false,
-            settleUpConfirmBody:{}
+            showModalPopup: false,
+            settleUpConfirmBody: {}
             // you owe people - split equally -- 1
             // people owe you - split equally -- 2
             // you owe people full amount -- 3
@@ -74,9 +76,13 @@ export default class SplitIt extends Component {
             responseTransactions.push(transaction)
 
         });
+        console.log("response transaction is ",responseTransactions);
+        this.props.updateTransaction(responseTransactions);
 
         this.setState({ transactionList: responseTransactions }, () => {
             console.log("transactions = ", this.state.transactionList)
+        }, () => {
+            console.log("GLobal transaction is :::",this.props.transactionGlobal);
         })
     }
 
@@ -106,7 +112,7 @@ export default class SplitIt extends Component {
     }
 
 
-    async settleup(finalbody){
+    async settleup(finalbody) {
         console.log("finalbody is ", finalbody);
         const headers = {
             "Content-Type": `application/json`
@@ -123,8 +129,8 @@ export default class SplitIt extends Component {
             this.isShowPopup(true)
         }
 
-        finalbody["id"]=response.data["id"]
-        this.settleUpConfirmBody=finalbody
+        finalbody["id"] = response.data["id"]
+        this.settleUpConfirmBody = finalbody
         // console.log(finalbody,"final body for settle up confirmation")
         // const newrequest= {
         //     baseURL: "http://127.0.0.1:8000/settleUpConfirm/",
@@ -135,18 +141,18 @@ export default class SplitIt extends Component {
         // const response1 = await axios(newrequest);
 
     }
-    handlesettleUp= (e) => {
+    handlesettleUp = (e) => {
         //const { value, checked } = e.target;
         console.log(e.target.value)
-        var data=e.target.value
-        data = this.state.transactionList.filter((x)=>x.source ==  data)
-        var finalData=data[0]
+        var data = e.target.value
+        data = this.props.transactionGlobal.filter((x) => x.source == data)
+        var finalData = data[0]
         console.log(finalData)
         this.settleup(finalData);
-       // console.log(checked,"inside handleSettle")
+        // console.log(checked,"inside handleSettle")
     }
 
-    showName = (x)=> {
+    showName = (x) => {
         var custDetails = this.state.customerslist
         for (var ele in custDetails) {
             if (custDetails[ele].id == x) {
@@ -235,7 +241,7 @@ export default class SplitIt extends Component {
         e.preventDefault();
         var showHide = this.state.showTransaction
         this.setState({
-            showTransaction:!showHide
+            showTransaction: !showHide
         })
         // console.log('handleClick 👉️', this.state.amount);
     }
@@ -249,7 +255,7 @@ export default class SplitIt extends Component {
         }
     }
 
-  
+
 
 
     render() {
@@ -260,14 +266,14 @@ export default class SplitIt extends Component {
         let transactionsSplit;
         let splitType;
         let showOrHideTransactions = this.state.showTransaction;
-        if (this.state.transactionList.length <= 0) {
+        if (this.props.transactionGlobal.length <= 0) {
             transactionsSplit = <div>No transactions yet</div>
         }
         else {
-            
+
             showOrHideTransactions ? transactionsSplit = <div className='transaction_list_wrapper'><h2>Transaction List</h2>
                 <ul>
-                    {this.state.transactionList.map((transaction) =>
+                    {this.props.transactionGlobal.map((transaction) =>
                         <li
                             className='single_transaction'
                             name="lang"
@@ -282,17 +288,17 @@ export default class SplitIt extends Component {
                 </ul>
             </div> : transactionsSplit = <div></div>
         }
-        splitType = <div className='transaction_list_wrapper' style={{padding:'2px'}}><h5>Select SPLIT Type</h5>
-            <select className='dropdown_splitoption'  onChange={this.handleClickOwingOption}>
+        splitType = <div className='transaction_list_wrapper' style={{ padding: '2px' }}><h5>Select SPLIT Type</h5>
+            <select className='dropdown_splitoption' onChange={this.handleClickOwingOption}>
                 {this.owingList.map((opt, idx) =>
                     <option
-                    className='dropdown_splitoption'
+                        className='dropdown_splitoption'
                         key={opt}
                         type="radio"
                         name="lang"
                         value={idx + 1}
-                        >
-                            {opt}
+                    >
+                        {opt}
                     </option>
                 )}
             </select>
@@ -355,7 +361,7 @@ export default class SplitIt extends Component {
                             showModalPopup={this.state.showModalPopup}
                             onPopupClose={this.isShowPopup}
                             pendingResponse={this.settleUpConfirmBody}
-                            pathURL = "http://127.0.0.1:8000/settleUpConfirm/"
+                            pathURL="http://127.0.0.1:8000/settleUpConfirm/"
 
                         ></ModalPopup>
                     </Fragment>
@@ -366,3 +372,10 @@ export default class SplitIt extends Component {
         )
     }
 }
+
+const mapStateToProps = (state) => {
+    return {
+        transactionGlobal: state.transaction.transactionList
+    }
+}
+export default connect(mapStateToProps, { updateTransaction })(SplitIt)

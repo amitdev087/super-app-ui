@@ -7,6 +7,7 @@ import SplitIt from './splitIt';
 import { Link } from 'react-router-dom'
 import '../styles/splitpay.css'
 import ReactSpinnerTimer from "react-spinner-timer";
+import {connect} from 'react-redux'
 
 export default class ListCustomers extends Component {
     constructor(props) {
@@ -22,7 +23,8 @@ export default class ListCustomers extends Component {
             isGpCompleted: false,
             gpList: [],
             showSpinner: false,
-            isFailedUserInList: false
+            isFailedUserInList: false,
+            transactionGlobal:[]
         }
 
         this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
@@ -369,3 +371,4 @@ export default class ListCustomers extends Component {
         )
     }
 }
+
