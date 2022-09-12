@@ -54,5 +54,10 @@ input{
 }
 .display_groupStatus{
     display: flex;
+    padding: 0 5 px;
     /* grid-template-columns: 50% 50%; */
+}
+.loader_groupPaymentStatus{
+    display: block;
+    margin: 0 10px;
 }
