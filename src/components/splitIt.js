@@ -346,7 +346,7 @@ class SplitIt extends Component {
 
                 </div>
                 <div>
-                    <Fragment>
+                    {/* <Fragment>
                         <h3 align="center">Demo of Modal Pop up in Reactjs</h3>
                         <header align="center">
                             <Fragment>
@@ -356,7 +356,7 @@ class SplitIt extends Component {
                                     <button>Modal Pop up</button>
                                 </div>
                             </Fragment>
-                        </header>
+                        </header> */}
                         <ModalPopup
                             showModalPopup={this.state.showModalPopup}
                             onPopupClose={this.isShowPopup}
@@ -364,7 +364,7 @@ class SplitIt extends Component {
                             pathURL="http://127.0.0.1:8000/settleUpConfirm/"
 
                         ></ModalPopup>
-                    </Fragment>
+                    {/* </Fragment> */}
                 </div>
                 <div>
                 </div>

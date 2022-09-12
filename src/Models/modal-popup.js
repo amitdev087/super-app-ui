@@ -3,13 +3,14 @@ import { Modal } from 'react-bootstrap';
 import axios from "axios";
 import { updateTransaction } from '../Redux/Actions/TransactionsActions';
 import {connect} from 'react-redux';
+import '../styles/splitit.css'
+import { updateCompletedMerchantPayment } from '../Redux/Actions/TransactionsActions';
   
 class ModalPopup extends Component {  
     constructor(props) {  
         super(props);  
         this.state = {  
             showModal: false,
-            // transactionList:[]
         };
         
         this.createAcceptRequest = this.createAcceptRequest.bind(this);
@@ -43,8 +44,11 @@ class ModalPopup extends Component {
 
         const response = await axios(request);
         console.log(response.data)
-        if(response.status == 201){
+        if(response.status == 201 || response.status == 200){
             this.getTransactions()
+            this.props.updateCompletedMerchantPayment(true);
+        }else{
+            this.props.updateCompletedMerchantPayment(false);
         }
     }
   
@@ -79,13 +83,14 @@ class ModalPopup extends Component {
                 >  
                     <Modal.Header closeButton>  
                         <Modal.Title id="sign-in-title">  
-                            React Modal Pop up Example  
+                            Ewallet to Ewallet Transaction 
                          </Modal.Title>  
                     </Modal.Header>  
                     <Modal.Body>  
-                        <hr />  
                         <div className="signUp">  
-                            <p>Want to Complete the payment?<button type="button" className="link-button" onClick={() => this.isShowModal(true)}> Accept </button></p>  
+                            <p>Amount will be deducted from your Ewallet</p>
+                            <p>Want to Complete the payment of {this.props.amount}?</p>
+                            <button type="button" className='button_primary' onClick={() => this.isShowModal(true)}> Accept </button>  
                         </div>  
                     </Modal.Body>  
   
@@ -100,4 +105,4 @@ const mapStateToProps = (state) => {
         transactionGlobal: state.transaction.transactionList
     }
 }
-export default connect(mapStateToProps,{ updateTransaction })(ModalPopup)
+export default connect(mapStateToProps,{ updateTransaction,updateCompletedMerchantPayment })(ModalPopup)

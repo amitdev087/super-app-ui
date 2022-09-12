@@ -5,3 +5,11 @@ export const updateTransaction = transaction => {
         payload: transaction,
     }
 }
+
+export const updateCompletedMerchantPayment = iscompleted => {
+    console.log("Inside action",iscompleted);
+    return{
+        type: "UPDATE_COMPLETED_PAYMENT",
+        payload: iscompleted,
+    }
+}

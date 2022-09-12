@@ -7,9 +7,10 @@ import SplitIt from './splitIt';
 import { Link } from 'react-router-dom'
 import '../styles/splitpay.css'
 import ReactSpinnerTimer from "react-spinner-timer";
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
+import { updateCompletedMerchantPayment, updateTransaction } from '../Redux/Actions/TransactionsActions';
 
-export default class ListCustomers extends Component {
+class ListCustomers extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -24,7 +25,9 @@ export default class ListCustomers extends Component {
             gpList: [],
             showSpinner: false,
             isFailedUserInList: false,
-            transactionGlobal:[]
+            transactionGlobal: [],
+            amountPerUser: 0,
+            isMerchantPaymentCompleted: false
         }
 
         this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
@@ -38,6 +41,7 @@ export default class ListCustomers extends Component {
         this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
         this.isShowPopup = this.isShowPopup.bind(this);
         this.handleLapChange = this.handleLapChange.bind(this);
+        this.recordFailedPaymentToSplitIt = this.recordFailedPaymentToSplitIt.bind(this);
     }
 
     isShowPopup = (status) => {
@@ -55,11 +59,11 @@ export default class ListCustomers extends Component {
                     isFailedUserInList: true
                 })
             }
-            else{
-                this.setState({
-                    isFailedUserInList: false
-                })
-            }
+            // else {
+            //     this.setState({
+            //         isFailedUserInList: false
+            //     })
+            // }
         }
     }
 
@@ -118,7 +122,7 @@ export default class ListCustomers extends Component {
 
         var totalCustomerCount = this.state.selectedIds.length + 1;
         if (this.state.isFailedUserInList) {
-            var finalamount = this.state.amount - 2*((this.state.amount) / (totalCustomerCount))
+            var finalamount = this.state.amount - 2 * ((this.state.amount) / (totalCustomerCount))
         }
         else {
             var finalamount = this.state.amount - ((this.state.amount) / (totalCustomerCount))
@@ -156,7 +160,8 @@ export default class ListCustomers extends Component {
             this.setState({
                 isGpCompleted: true,
                 gpList: gpMembers,
-                showSpinner: true
+                showSpinner: true,
+                amountPerUser: (this.state.amount) / (totalCustomerCount)
             }, () => { console.log("gpbody is *******", gpMembers) })
         }
         else {
@@ -167,6 +172,40 @@ export default class ListCustomers extends Component {
         }
     }
 
+    recordFailedPaymentToSplitIt = async () => {
+        // var owingOption = this.state.owingOption;
+        // var individualAmount = (this.state.amount)/
+
+        // var finalbody = [];
+
+        // this.state.selectedIds.forEach((x) => {
+        // var name = this.showName(x);
+        // console.log("SHow name is ***********", name)
+        var finalbody = [{
+            source: this.FailedUser,
+            amount: this.state.amountPerUser,
+            destination: "cus_5dedc9d323b7928b256317886173bbca",
+            name: "Mohit"
+        }]
+        // finalbody.push(individualBody);
+        // })
+        console.log("finalbody is ", finalbody);
+        const headers = {
+            "Content-Type": `application/json`
+        };
+
+        const request = {
+            baseURL: "http://127.0.0.1:8000/transactionList/",
+            headers,
+            data: finalbody,
+            method: 'post',
+        };
+        const response = await axios(request);
+        console.log(response.data)
+        if (response.status == 201) {
+            await this.getTransactions();
+        }
+    }
 
     makePaymentEwallet = async () => {
         var ewalletpaymentbody = {
@@ -235,6 +274,8 @@ export default class ListCustomers extends Component {
         }, () => (console.log('merchantClick 👉️', this.state.selectedMerchant)))
     }
 
+
+
     render() {
         console.log(this.state.customerslist);
         let merchants;
@@ -242,6 +283,7 @@ export default class ListCustomers extends Component {
         let makePaymentEwallet;
         let createdGPWIthLoader = "";
         let isMerchantSelected = this.state.selectedMerchant == "" ? false : true;
+        let promptToUpdateSplitIt;
         // if (this.state.selectedMerchant == "") {
         clickedMerchant = "";
         console.log("inside render for merhcant ", this.state.merchantsList);
@@ -256,9 +298,9 @@ export default class ListCustomers extends Component {
                     /> {merchant.name}
                 </label>)}
             </ul></div>
-
-        // }
-        // else {
+        if (this.state.amount > 0 && this.state.selectedIds.length > 0 && this.state.selectedMerchant != "") {
+            makePaymentEwallet = <button className='button_primary' onClick={this.makePaymentEwallet} label="Make Payment to Merchant">Pay to Merchant USD {this.state.amount}</button>
+        }
         clickedMerchant = <div className='form-group'>
             <input
                 type="number"
@@ -286,13 +328,11 @@ export default class ListCustomers extends Component {
                                     onLapInteraction={this.handleLapChange}
                                     isPause={false}
                                 />
-                            </div> : <h6> {this.FailedUser == customer.id ? "Failed" : "Passed"}</h6>}
-
-
-
+                            </div> : <h6> {this.FailedUser == customer.id ? "Payment cancelled" : ((this.state.amountPerUser) + " USD Received")}</h6>}
                         </div>
                     </label>)}
                 </ul>
+                {this.state.showSpinner ? <button className='button_primary' disabled="true" label="Make Payment to Merchant">Recieving Payments</button> : makePaymentEwallet}
             </div>
         }
         let button;
@@ -317,21 +357,29 @@ export default class ListCustomers extends Component {
                 <div>{button}</div>
             </div>
         }
-        if (this.state.amount > 0 && this.state.selectedIds.length > 0 && this.state.selectedMerchant != "") {
-            makePaymentEwallet = <button className='button_primary' onClick={this.makePaymentEwallet} label="Make Payment to Merchant">Make Payment to Merchant</button>
+
+        console.log("ISMERCHANTPAYMENTCOMPLETED", this.props.isMerchantPaymentCompleted)
+        console.log("ISMERCHANTPAYMENTCOMPLETED******", this.state.isFailedUserInList)
+        if (this.state.isFailedUserInList && this.props.isMerchantPaymentCompleted) {
+            promptToUpdateSplitIt = <div className='transaction_list_wrapper'>
+                <p>You made a payment of {this.state.amountPerUser} for you friend Mohit too</p>
+                <p>Record a payment in SPLITIT?</p>
+                <button className='button_primary' onClick={this.recordFailedPaymentToSplitIt}>Record It</button>
+            </div>
         }
+
         return (
             <div className='container' style={{ padding: '2rem', width: '60%' }}>
                 <div>
                     {merchants}
                     {clickedMerchant}
                     {finalamount}
-                    {makePaymentEwallet}
                     {createdGPWIthLoader}
+                    {promptToUpdateSplitIt}
 
                 </div>
                 <div>
-                    <Fragment>
+                    {/* <Fragment>
                         <h3 align="center">Demo of Modal Pop up in Reactjs</h3>
                         <header align="center">
                             <Fragment>
@@ -341,14 +389,15 @@ export default class ListCustomers extends Component {
                                     <button className='button_primary'>Modal Pop up</button>
                                 </div>
                             </Fragment>
-                        </header>
-                        <ModalPopup
-                            showModalPopup={this.state.showModalPopup}
-                            onPopupClose={this.isShowPopup}
-                            pendingResponse={this.state.pendingResponse}
-                            pathURL = "http://127.0.0.1:8000/setTransferResponse/"
-                        ></ModalPopup>
-                    </Fragment>
+                        </header> */}
+                    <ModalPopup
+                        showModalPopup={this.state.showModalPopup}
+                        onPopupClose={this.isShowPopup}
+                        pendingResponse={this.state.pendingResponse}
+                        pathURL="http://127.0.0.1:8000/setTransferResponse/"
+                        amount={this.state.amount}
+                    ></ModalPopup>
+                    {/* </Fragment> */}
                 </div>
                 <div style={{ display: 'flex', padding: "5px 0" }}>
                     <button className='button_primary' style={{ width: "95%" }}>
@@ -358,8 +407,6 @@ export default class ListCustomers extends Component {
                             Go to SplitIt
                         </Link>
                     </button>
-                    {/* </div>
-                <div> */}
                     <button className='button_primary' style={{ width: "95%" }}>
                         <Link to={{
                             pathname: "/salarySplit"
@@ -372,3 +419,9 @@ export default class ListCustomers extends Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        isMerchantPaymentCompleted: state.transaction.isMerchantPaymentCompleted
+    }
+}
+export default connect(mapStateToProps, { updateTransaction, updateCompletedMerchantPayment })(ListCustomers)
