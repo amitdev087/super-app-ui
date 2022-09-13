@@ -28,6 +28,8 @@ class SplitIt extends Component {
       isLoading: false,
       buttonEnable: true,
       responseMessage: "",
+      selectedUserToPay: "",
+      settleUpAmount : "",
       // you owe people - split equally -- 1
       // people owe you - split equally -- 2
       // you owe people full amount -- 3
@@ -107,8 +109,8 @@ class SplitIt extends Component {
     response.data["data"].forEach((element) => {
       var customer = element;
       if (
-        customer.ewallet != "" &&
-        customer.id != "cus_5dedc9d323b7928b256317886173bbca"
+        customer.ewallet != "" //&&
+        // customer.id != "cus_5dedc9d323b7928b256317886173bbca"
       ) {
         responsecustomers.push(customer);
       }
@@ -138,14 +140,6 @@ class SplitIt extends Component {
 
     finalbody["id"] = response.data["id"];
     this.settleUpConfirmBody = finalbody;
-    // console.log(finalbody,"final body for settle up confirmation")
-    // const newrequest= {
-    //     baseURL: "http://127.0.0.1:8000/settleUpConfirm/",
-    //     headers,
-    //     data: finalbody,
-    //     method: 'post',
-    // };
-    // const response1 = await axios(newrequest);
   }
   handlesettleUp = (e) => {
     //const { value, checked } = e.target;
@@ -153,6 +147,10 @@ class SplitIt extends Component {
     var data = e.target.value;
     data = this.props.transactionGlobal.filter((x) => x.source == data);
     var finalData = data[0];
+    finalData.amount = (Math.abs(finalData.amount)).toFixed(1);
+    this.setState({
+      settleUpAmount:finalData.amount
+    })
     console.log(finalData);
     this.settleup(finalData);
     // console.log(checked,"inside handleSettle")
@@ -171,17 +169,17 @@ class SplitIt extends Component {
       isLoading: true,
       buttonEnable: false,
     });
-    var owingOption = this.state.owingOption;
+    // var owingOption = this.state.owingOption;
     var totalCustomerCount = this.state.selectedIds.length + 1;
-    if (owingOption == 1) {
-      var individualAmount = this.state.amount / totalCustomerCount;
-    } else if (owingOption == 2) {
-      var individualAmount = -(this.state.amount / totalCustomerCount);
-    } else if (owingOption == 3) {
-      var individualAmount = -this.state.amount;
-    } else {
-      var individualAmount = this.state.amount;
-    }
+    // if (owingOption == 1) {
+    var individualAmount = this.state.amount / totalCustomerCount;
+    // } else if (owingOption == 2) {
+    //   var individualAmount = -(this.state.amount / totalCustomerCount);
+    // } else if (owingOption == 3) {
+    //   var individualAmount = -this.state.amount;
+    // } else {
+    //   var individualAmount = this.state.amount;
+    // }
     var finalbody = [];
 
     this.state.selectedIds.forEach((x) => {
@@ -190,8 +188,9 @@ class SplitIt extends Component {
       var individualBody = {
         source: x,
         amount: individualAmount,
-        destination: "cus_5dedc9d323b7928b256317886173bbca",
+        destination: this.state.selectedUserToPay,
         name: this.showName(x),
+        destinationName: this.showName(this.state.selectedUserToPay)
       };
       finalbody.push(individualBody);
     });
@@ -242,7 +241,7 @@ class SplitIt extends Component {
     console.log(e.target.value);
     this.setState(
       {
-        owingOption: e.target.value,
+        selectedUserToPay: e.target.value,
       },
       () => console.log("owing option is 👉️", this.state.owingOption)
     );
@@ -272,6 +271,18 @@ class SplitIt extends Component {
     }
   }
 
+  checkSettleUp(sentAmount, sourceCustomer) {
+    if (parseInt(sentAmount) < 0) {
+      return <button
+        className="button_primary"
+        value={sourceCustomer}
+        onClick={this.handlesettleUp}
+      >
+        settleUp
+      </button>
+    }
+  }
+
   render() {
     console.log(this.state.customerslist);
     let merchants;
@@ -285,34 +296,28 @@ class SplitIt extends Component {
     } else {
       showOrHideTransactions
         ? (transactionsSplit = (
-            <div className="transaction_list_wrapper">
-              <h2>Transaction List</h2>
-              <ul>
-                {this.props.transactionGlobal.map((transaction) => (
-                  <li
-                    className="single_transaction"
-                    name="lang"
-                    value={transaction.source}
-                    onChange={this.handleChange}
-                  >
-                    <p className="p">
-                      <strong>{transaction.name}</strong>{" "}
-                      {this.checkOwes(transaction.amount)}{" "}
-                      {Math.abs(transaction.amount.toFixed(2))} USD
-                    </p>
+          <div className="transaction_list_wrapper">
+            <h2>Transaction List</h2>
+            <ul>
+              {this.props.transactionGlobal.map((transaction) => (
+                <li
+                  className="single_transaction"
+                  name="lang"
+                  value={transaction.source}
+                  onChange={this.handleChange}
+                >
+                  <p className="p">
+                    <strong>{transaction.name}</strong>{" "}
+                    {this.checkOwes(transaction.amount)}{" "}
+                    {Math.abs(transaction.amount).toFixed(2)} USD
+                  </p>
 
-                    <button
-                      className="button_primary"
-                      value={transaction.source}
-                      onClick={this.handlesettleUp}
-                    >
-                      settleUp
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
+                  {this.checkSettleUp(transaction.amount, transaction.source)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
         : (transactionsSplit = <div></div>);
     }
     splitType = (
@@ -322,15 +327,15 @@ class SplitIt extends Component {
           className="dropdown_splitoption"
           onChange={this.handleClickOwingOption}
         >
-          {this.owingList.map((opt, idx) => (
+          {this.state.customerslist.map((customer) => (
             <option
               className="dropdown_splitoption"
-              key={opt}
+              key={customer.id}
               type="radio"
               name="lang"
-              value={idx + 1}
+              value={customer.id}
             >
-              {opt}
+              Paid by {customer.name} split equally
             </option>
           ))}
         </select>
@@ -357,42 +362,44 @@ class SplitIt extends Component {
     if (this.buttonEnable) {
       button = (
         <button className="button_primary" onClick={this.createSplit}>
-          {" "}
-          Split It!{" "}
+          Split It!
         </button>
       );
     }
     console.log("button value is :", this.state.selectedIds > 0);
     let finalamount;
     // if (this.state.amount > 0) {
-    finalamount = (
-      <div className="transaction_list_wrapper">
-        <h5>Select Friends</h5>
-        <ul className="grid_listcustomers">
-          {this.state.customerslist.map((customer) => (
-            <label key={customer.id}>
-              <input
-                type="checkbox"
-                name="lang"
-                value={customer.id}
-                onChange={this.handleChange}
-              />{" "}
-              {customer.name}
-            </label>
-          ))}
-        </ul>
-        <div>{button}</div>
-      </div>
-    );
+
+    if (this.state.selectedUserToPay != "") {
+      finalamount = (
+        <div className="transaction_list_wrapper">
+          <h5>Select Friends</h5>
+          <ul className="grid_listcustomers">
+            {this.state.customerslist.map((customer) => (
+              <label key={customer.id} hidden={customer.id == this.state.selectedUserToPay}>
+                <input
+                  type="checkbox"
+                  name="lang"
+                  value={customer.id}
+                  onChange={this.handleChange}
+                />
+                {customer.name}
+              </label>
+            ))}
+          </ul>
+          <div>{button}</div>
+        </div>
+      );
+    }
     // }
     return (
       <div className="container" style={{ padding: "2rem", width: "60%" }}>
         <div>
-        <div disabled={!this.state.buttonEnable}>
-          {clickedMerchant}
-          {splitType}
-          {merchants}
-          {finalamount}
+          <div disabled={!this.state.buttonEnable}>
+            {clickedMerchant}
+            {splitType}
+            {merchants}
+            {finalamount}
           </div>
           {this.state.responseMessage != "" || this.state.isLoading == true ? (
             <div className="transaction_list_wrapper">
@@ -416,24 +423,13 @@ class SplitIt extends Component {
           {transactionsSplit}
         </div>
         <div>
-          {/* <Fragment>
-                        <h3 align="center">Demo of Modal Pop up in Reactjs</h3>
-                        <header align="center">
-                            <Fragment>
-                                <div
-                                    className="nav-item"
-                                    onClick={() => this.isShowPopup(true)}>
-                                    <button>Modal Pop up</button>
-                                </div>
-                            </Fragment>
-                        </header> */}
           <ModalPopup
             showModalPopup={this.state.showModalPopup}
             onPopupClose={this.isShowPopup}
             pendingResponse={this.settleUpConfirmBody}
             pathURL="http://127.0.0.1:8000/settleUpConfirm/"
+            amount = {this.state.settleUpAmount}
           ></ModalPopup>
-          {/* </Fragment> */}
         </div>
         <div></div>
       </div>
