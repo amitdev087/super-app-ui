@@ -53,11 +53,14 @@ input{
     grid-template-columns: 50% 50%;
 }
 .display_groupStatus{
-    display: flex;
-    padding: 0 5 px;
+    display: grid;
+    padding: 0 5px;
+    grid-template-columns: 50% 50%;
+    grid-row-gap: 10px;
     /* grid-template-columns: 50% 50%; */
 }
 .loader_groupPaymentStatus{
     display: block;
     margin: 0 10px;
+    border: 1px solid cyan;
 }

@@ -355,14 +355,14 @@ class SplitIt extends Component {
     );
 
     let button;
-    if (this.state.selectedIds.length > 0 && this.state.amount > 0) {
+    if (this.state.selectedIds.length > 0) {
       this.buttonEnable = true;
       // button = <button className='button_primary' onClick={this.createSplit}> Split It!{this.isLoading? <LoadingSpinner/>:} </button>;
     }
     if (this.buttonEnable) {
       button = (
-        <button className="button_primary" onClick={this.createSplit}>
-          Split It!
+        <button className="button_primary" onClick={this.createSplit} disabled={this.state.amount < 1 || this.state.amount == "" }>
+          {this.state.amount > 0 ? "Split It!" : "Please enter amount"}
         </button>
       );
     }
