@@ -325,7 +325,7 @@ class SplitIt extends Component {
         <h5>Select SPLIT Type</h5>
         <select
           className="dropdown_splitoption"
-          onChange={this.handleClickOwingOption}
+          onClick={this.handleClickOwingOption}
         >
           {this.state.customerslist.map((customer) => (
             <option
