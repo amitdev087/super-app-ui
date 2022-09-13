@@ -13,19 +13,23 @@ import { Provider } from "react-redux";
 import TransactionReducer from "./Redux/Reducer/TransactionReducer";
 import { createStore } from "redux";
 import allReducers from "./Redux/Reducer/CombinedReducer";
+import Header from "./components/header";
 
 const store = createStore(allReducers);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
+    <Header/>
     <Router>
       <Routes>
         <Route path="/" element={<Make_payment />}></Route>
         <Route path="/listcustomers" element={<ListCustomers />}></Route>
         <Route path="/splitIt" element={<SplitIt />}></Route>
         <Route path="/salarySplit" element={<SalarySplit />}></Route>
+        <Route path="/header" element={<Header />}></Route>
       </Routes>
     </Router>
+    
   </Provider>
 );
 
