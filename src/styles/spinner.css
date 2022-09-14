@@ -13,4 +13,5 @@
     border-top: 5px solid #0dcaf0; /* Black */
     border-radius: 50%;
     animation: spinner 1.5s linear infinite;
+    margin-left: 45%;
   }

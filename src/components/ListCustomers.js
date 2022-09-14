@@ -37,6 +37,9 @@ class ListCustomers extends Component {
       responseMessage: "",
       merchantPaymentStarted: false,
       payToMerchantButtpn: true,
+      groupId: "",
+      refundMassage: "",
+      refundLoader: false,
     };
 
     this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
@@ -50,6 +53,7 @@ class ListCustomers extends Component {
     this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
     this.isShowPopup = this.isShowPopup.bind(this);
     this.handleLapChange = this.handleLapChange.bind(this);
+    this.createRefund = this.createRefund.bind(this);
     this.recordFailedPaymentToSplitIt =
       this.recordFailedPaymentToSplitIt.bind(this);
   }
@@ -175,9 +179,12 @@ class ListCustomers extends Component {
     }
 
     console.log("selectedIds are ************** ", this.state.selectedIds);
+    console.log(response.data, "response data for whole gruop payment");
+    var gpid = response.data;
     if (response.status == 200 || response.status == 201) {
       this.setState(
         {
+          groupId: gpid,
           isLoading: false,
           responseMessage: "Group payment Created",
           isGpCompleted: true,
@@ -187,6 +194,10 @@ class ListCustomers extends Component {
         },
         () => {
           console.log("gpbody is *******", gpMembers);
+          console.log(
+            this.state.groupId,
+            "group id for created geoup apy dj fdofkdjfkdhflh"
+          );
         }
       );
     } else {
@@ -197,8 +208,31 @@ class ListCustomers extends Component {
         responseMessage: "Failed to create payment",
       });
     }
+    // console.log(this.state.groupId,"group id for created geoup apy dj fdofkdjfkdhflh")
   };
 
+  createRefund = async () => {
+    this.setState({ refundLoader: false });
+    var finalBody = {};
+    finalBody["id"] = this.state.groupId;
+    console.log(finalBody, "refundBpdy us sudf dof df ");
+    const headers = {
+      "Content-Type": `application/json`,
+    };
+
+    const request = {
+      baseURL: "http://127.0.0.1:8000/groupRefund/",
+      headers,
+      data: finalBody,
+      method: "post",
+    };
+    const response = await axios(request);
+    if ((response.status = 200)) {
+      this.setState({
+        refundMassage: "Your amount was refunded sucessfully",
+      });
+    }
+  };
   recordFailedPaymentToSplitIt = async () => {
     // var owingOption = this.state.owingOption;
     // var individualAmount = (this.state.amount)/
@@ -458,14 +492,14 @@ class ListCustomers extends Component {
       );
     }
 
-    console.log(
-      "ISMERCHANTPAYMENTCOMPLETED",
-      this.props.isMerchantPaymentCompleted
-    );
-    console.log(
-      "ISMERCHANTPAYMENTCOMPLETED******",
-      this.state.isFailedUserInList
-    );
+    // console.log(
+    //   "ISMERCHANTPAYMENTCOMPLETED",
+    //   this.props.isMerchantPaymentCompleted
+    // );
+    // console.log(
+    //   "ISMERCHANTPAYMENTCOMPLETED******",
+    //   this.state.isFailedUserInList
+    // );
     if (
       this.state.isFailedUserInList &&
       this.props.isMerchantPaymentCompleted
@@ -486,6 +520,11 @@ class ListCustomers extends Component {
         </div>
       );
     }
+    // if(this.props.isMerchantPaymentCompleted){
+    //   <button>
+    //     Create Refund
+    //   </button>
+    // };
 
     return (
       <div className="container" style={{ padding: "2rem", width: "60%" }}>
@@ -517,10 +556,19 @@ class ListCustomers extends Component {
           ) : this.props.merchantPaymentMessage != "" ? (
             <div className="transaction_list_wrapper">
               {this.props.merchantPaymentMessage}
+              {this.props.merchantPaymentMessage ==
+              "Your Request was cancelled" ? (
+                <button className="button_primary" onClick={this.createRefund}>
+                  Create Refund{" "}
+                </button>
+              ) : (
+                <div></div>
+              )}
             </div>
           ) : (
             <div></div>
           )}
+
 
           {promptToUpdateSplitIt}
         </div>
