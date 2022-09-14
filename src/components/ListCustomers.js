@@ -395,7 +395,7 @@ class ListCustomers extends Component {
                       {" "}
                       {this.FailedUser == customer.id
                         ? "Payment cancelled"
-                        : this.state.amountPerUser + " USD Received"}
+                        : this.state.amountPerUser.toFixed(2) + " USD Received"}
                     </h6>
                   )}
                 </div>
@@ -422,7 +422,7 @@ class ListCustomers extends Component {
       <button
         className="button_primary"
         onClick={this.createGroup}
-        disabled={!isMerchantSelected}
+        disabled={!isMerchantSelected || this.state.selectedIds.length < 3}
       >
         {isMerchantSelected && this.state.selectedIds.length > 2
           ? "Create Group Payment"
