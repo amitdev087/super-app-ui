@@ -22,7 +22,7 @@ root.render(
     <Header/>
     <Router>
       <Routes>
-        <Route path="/" element={<Make_payment />}></Route>
+        <Route path="/" element={<ListCustomers />}></Route>
         <Route path="/listcustomers" element={<ListCustomers />}></Route>
         <Route path="/splitIt" element={<SplitIt />}></Route>
         <Route path="/salarySplit" element={<SalarySplit />}></Route>
