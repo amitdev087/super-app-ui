@@ -40,6 +40,7 @@ class ListCustomers extends Component {
       groupId: "",
       refundMassage: "",
       refundLoader: false,
+      refundEnable: false,
     };
 
     this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
@@ -212,7 +213,7 @@ class ListCustomers extends Component {
   };
 
   createRefund = async () => {
-    this.setState({ refundLoader: false });
+    this.setState({ refundLoader: true, refundEnable: true });
     var finalBody = {};
     finalBody["id"] = this.state.groupId;
     console.log(finalBody, "refundBpdy us sudf dof df ");
@@ -230,6 +231,7 @@ class ListCustomers extends Component {
     if ((response.status = 200)) {
       this.setState({
         refundMassage: "Your amount was refunded sucessfully",
+        refundLoader: false,
       });
     }
   };
@@ -558,9 +560,14 @@ class ListCustomers extends Component {
               {this.props.merchantPaymentMessage}
               {this.props.merchantPaymentMessage ==
               "Your Request was cancelled" ? (
-                <button className="button_primary" onClick={this.createRefund}>
-                  Create Refund{" "}
-                </button>
+                <div disabled={this.state.refundEnable}>
+                  <button
+                    className="button_primary"
+                    onClick={this.createRefund}
+                  >
+                    Create Refund{" "}
+                  </button>
+                </div>
               ) : (
                 <div></div>
               )}
@@ -568,7 +575,17 @@ class ListCustomers extends Component {
           ) : (
             <div></div>
           )}
-
+          {this.state.refundEnable ? (
+            <div className="transaction_list_wrapper">
+              {this.state.refundLoader ? (
+                <LoadingSpinner />
+              ) : (
+                <p>{this.state.refundMassage}</p>
+              )}
+            </div>
+          ) : (
+            <div></div>
+          )}
 
           {promptToUpdateSplitIt}
         </div>

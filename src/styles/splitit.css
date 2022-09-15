@@ -22,6 +22,7 @@ div[disabled]
     margin: 0.5rem;
     margin-top: 0.2rem;
     margin-bottom: 0.2rem;
+    text-align: center;
 }
 ul{
     padding: 1rem;
@@ -47,6 +48,7 @@ input{
     margin: auto;
     padding: 1px 1px;
     background: #0dcaf0;
+    text-align: center;
 }
 
 .grid_listcustomers{
