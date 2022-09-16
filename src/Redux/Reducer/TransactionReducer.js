@@ -6,7 +6,7 @@ const initialState = {
     transactionList: [],
     isMerchantPaymentCompleted: false,
     merchantPaymentMessage:"",
-    custId:"cus_5dedc9d323b7928b256317886173bbca"
+    custId:"cus_633aa03184b6f015e790392b51c6bcd4"
 }
 
 export default function (state = initialState, action) {

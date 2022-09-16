@@ -14,6 +14,7 @@ import TransactionReducer from "./Redux/Reducer/TransactionReducer";
 import { createStore } from "redux";
 import allReducers from "./Redux/Reducer/CombinedReducer";
 import Header from "./components/header";
+import Login from "./components/login";
 
 const store = createStore(allReducers);
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -27,6 +28,7 @@ root.render(
         <Route path="/splitIt" element={<SplitIt />}></Route>
         <Route path="/salarySplit" element={<SalarySplit />}></Route>
         <Route path="/header" element={<Header />}></Route>
+        <Route path="/login" element={<Login />}></Route>
       </Routes>
     </Router>
     
