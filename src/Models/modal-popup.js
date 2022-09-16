@@ -91,7 +91,7 @@ class ModalPopup extends Component {
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title id="sign-in-title">
               Ewallet to Ewallet Transaction
             </Modal.Title>

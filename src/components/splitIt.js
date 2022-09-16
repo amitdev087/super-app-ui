@@ -150,8 +150,8 @@ class SplitIt extends Component {
     //const { value, checked } = e.target;
     console.log(e.target.value);
     var data = e.target.value;
-    data = this.props.transactionGlobal.filter((x) => x.source == data);
-    var finalData = data[0];
+    var transactionData = this.props.transactionGlobal.filter((x) => x.source == data);
+    var finalData = {...transactionData[0]};
     finalData.amount = (Math.abs(finalData.amount)).toFixed(1);
     this.setState({
       settleUpAmount: finalData.amount

@@ -2,11 +2,23 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import "../styles/login.css";
-export default function Login() {
-  const [errorMessages, setErrorMessages] = useState({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const userLogin = async (uname, pass) => {
+import { Component } from "react";
+import { connect } from "react-redux";
+import { setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
+class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      errorMessages : "",
+      isSubmitted : ""
+    }
+    this.userLogin = this.userLogin.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.renderErrorMessage = this.renderErrorMessage.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+  userLogin = async (uname, pass) => {
     var finalBody = {};
     finalBody["name"] = uname;
     finalBody["password"] = pass;
@@ -23,73 +35,78 @@ export default function Login() {
       method: "post",
     };
     const response = await axios(request);
-    console.log(response.data,"custmid of logged in user")
+    console.log(response.data, "custmid of logged in user")
     if ((response.status = 200)) {
-        setErrorMessages({ message:"Inavalid User Name or Password" })
+      this.props.setLoggedInCustomer(response.data)
+      this.setState({
+        errorMessages: "Logged In Successfully"
+      })
     } else {
-      setIsSubmitted(true);
+      this.setState({
+        errorMessages: "Inavalid User Name or Password",
+        isSubmitted : true
+      })
     }
+    console.log("******************",this.props.loggedInUser);
   };
 
-  const handleSubmit = (event) => {
+  handleSubmit = (event) => {
     //Prevent page reload
     event.preventDefault();
 
     var { uname, pass } = document.forms[0];
-    console.log(uname,pass,"usesr na,w asn dfjsofj password")
-    userLogin(uname.value, pass.value);
+    console.log(uname, pass, "usesr na,w asn dfjsofj password")
+    this.userLogin(uname.value, pass.value);
 
-    // Find user login info
-    //const userData = database.find((user) => user.username === uname.value);
-
-    // Compare user info
-//     if (userData) {
-//       if (userData.password !== pass.value) {
-//         // Invalid password
-//         setErrorMessages({ name: "pass", message: errors.pass });
-//       } else {
-//         setIsSubmitted(true);
-//       }
-//     } else {
-//       // Username not found
-//       setErrorMessages({ name: "uname", message: errors.uname });
-//     }
- };
+  };
 
 
   // Generate JSX code for error message
-  const renderErrorMessage = (name) =>
-    name === errorMessages && (
-      <div className="error">{errorMessages.message}</div>
+  renderErrorMessage = (name) =>
+    name === this.state.errorMessages && (
+      <div className="error">{this.state.errorMessages.message}</div>
     );
 
   // JSX code for login form
-  const renderForm = (
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <div className="input-container">
-          <label>Username </label>
-          <input type="text" name="uname" required />
-          {renderErrorMessage("uname")}
-        </div>
-        <div className="input-container">
-          <label>Password </label>
-          <input type="password" name="pass" required />
-          {renderErrorMessage("pass")}
-        </div>
-        <div className="button-container">
-          <input type="submit" />
-        </div>
-      </form>
-    </div>
-  );
+  
 
-  return (
-    <div className="app">
-      <div className="login-form">
-        <div className="title">Sign In</div>
-        {isSubmitted ? <div>User is successfully logged in</div> : renderForm}
+  render() {
+    console.log("******************",this.props.loggedInUser);
+    let renderForm = (
+      <div className="form">
+        <form onSubmit={this.handleSubmit}>
+          <div className="input-container">
+            <label>Username </label>
+            <input type="text" name="uname" required />
+            {this.renderErrorMessage("uname")}
+          </div>
+          <div className="input-container">
+            <label>Password </label>
+            <input type="password" name="pass" required />
+            {this.renderErrorMessage("pass")}
+          </div>
+          <div className="button-container">
+            <input type="submit" />
+          </div>
+        </form>
       </div>
-    </div>
-  );
+    );
+    return (
+      <div className="app" >
+        <div className="login-form">
+          <div className="title">Sign In</div>
+          {this.state.isSubmitted ? <div>User is successfully logged in</div> : renderForm}
+        </div>
+      </div>
+    );
+  }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    loggedInUser: state.transaction.custId,
+  };
+};
+export default connect(mapStateToProps, {
+  setLoggedInCustomer
+})(Login);
