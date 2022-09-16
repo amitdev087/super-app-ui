@@ -9,6 +9,7 @@ import "../styles/salarySplit.css";
 import LoadingSpinner from "./LoadingSpinner";
 import { setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
 import { connect } from "react-redux";
+
 class SalarySplit extends Component {
   constructor(props) {
     super(props);
@@ -23,6 +24,7 @@ class SalarySplit extends Component {
       isLoading: false,
       buttonEnable: true,
       responseMessage: "",
+      customerLoads: true,
     };
     this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
     this.makeRequest = this.makeRequest.bind(this);
@@ -141,19 +143,14 @@ class SalarySplit extends Component {
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
-      if (
-        customer.ewallet != "" &&
-        customer.id != this.props.custId
-      ) {
+      if (customer.ewallet != "" && customer.id != this.props.custId) {
         responsecustomers.push(customer);
       }
     });
 
     this.setState(
-      {
-        customerslist: responsecustomers.filter((x) =>
-          x.id != this.FailedUser
-        ),
+      { customerLoads:false,
+        customerslist: responsecustomers.filter((x) => x.id != this.FailedUser),
       },
       () => {
         console.log("csutomers = ", this.state.customerslist);
@@ -161,33 +158,7 @@ class SalarySplit extends Component {
     );
   }
 
-  // makePaymentEwallet = async () => {
-  //   var ewalletpaymentbody = {
-  //     amount: this.state.amount.toString(),
-  //     ids: this.state.selectedMerchant,
-  //   };
 
-  //   console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
-  //   const headers = {
-  //     "Content-Type": `application/json`,
-  //   };
-
-  //   const request = {
-  //     baseURL: "http://127.0.0.1:8000/accountTransfer/",
-  //     headers,
-  //     data: ewalletpaymentbody,
-  //     method: "post",
-  //   };
-
-  //   const response = await axios(request);
-  //   console.log(response.data);
-  //   this.setState({ pendingResponse: response.data }, () => {
-  //     console.log(this.state.pendingResponse);
-  //   });
-  //   if ((response.status = 200)) {
-  //     this.isShowPopup(true);
-  //   }
-  // };
 
   handleChange = (e) => {
     const { value, checked } = e.target;
@@ -285,27 +256,34 @@ class SalarySplit extends Component {
     console.log("button value is :", this.state.selectedIds > 0);
     let finalamount;
     if (this.state.amount > 0) {
-      finalamount = (
-        <div className="transaction_list_wrapper">
-          {/* <div>ListCustomers</div> */}
-
-          <h5>Select Employe's</h5>
-          <hr></hr>
-          <ul className="grid_listcustomers">
-            {this.state.customerslist.map((customer) => (
-              <label key={customer.id}>
-                <input
-                  type="checkbox"
-                  name="lang"
-                  value={customer.id}
-                  onChange={this.handleChange}
-                />{" "}
-                {customer.name}
-              </label>
-            ))}
-          </ul>
-          <div>{button}</div>
-        </div>
+      if (
+        this.state.customerLoads
+          ? (finalamount = (
+              <div className="transaction_list_wrapper">
+                <LoadingSpinner />
+              </div>
+            ))
+          : (finalamount = (
+              <div className="transaction_list_wrapper">
+                <h5>Select Friends</h5>
+                <hr></hr>
+                {/* <button onClick={this.makeRequest} label="Get customers">Get list of Friends</button> */}
+                <ul className="grid_listcustomers">
+                  {this.state.customerslist.map((customer) => (
+                    <label key={customer.id}>
+                      <input
+                        type="checkbox"
+                        name="lang"
+                        value={customer.id}
+                        onChange={this.handleChange}
+                      />{" "}
+                      {customer.name}
+                    </label>
+                  ))}
+                </ul>
+                <div>{button}</div>
+              </div>
+            ))
       );
     }
     if (
@@ -350,9 +328,9 @@ class SalarySplit extends Component {
 }
 const mapStateToProps = (state) => {
   return {
-    custId : state.transaction.custId
+    custId: state.transaction.custId,
   };
 };
 export default connect(mapStateToProps, {
-  setLoggedInCustomer
+  setLoggedInCustomer,
 })(SalarySplit);
