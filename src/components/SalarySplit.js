@@ -7,7 +7,9 @@ import SplitIt from "./splitIt";
 import { Link } from "react-router-dom";
 import "../styles/salarySplit.css";
 import LoadingSpinner from "./LoadingSpinner";
-export default class SalarySplit extends Component {
+import { setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
+import { connect } from "react-redux";
+class SalarySplit extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -141,7 +143,7 @@ export default class SalarySplit extends Component {
       var customer = element;
       if (
         customer.ewallet != "" &&
-        customer.id != "cus_5dedc9d323b7928b256317886173bbca"
+        customer.id != this.props.custId
       ) {
         responsecustomers.push(customer);
       }
@@ -346,3 +348,11 @@ export default class SalarySplit extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    custId : state.transaction.custId
+  };
+};
+export default connect(mapStateToProps, {
+  setLoggedInCustomer
+})(SalarySplit);

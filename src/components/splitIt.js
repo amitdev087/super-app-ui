@@ -6,7 +6,7 @@ import { Button } from "react-bootstrap";
 import "react-bootstrap";
 import "../styles/splitit.css";
 import { connect } from "react-redux";
-import { updateTransaction } from "../Redux/Actions/TransactionsActions";
+import { updateTransaction, setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
 import LoadingSpinner from "./LoadingSpinner";
 
 class SplitIt extends Component {
@@ -29,7 +29,7 @@ class SplitIt extends Component {
       buttonEnable: true,
       responseMessage: "",
       selectedUserToPay: "",
-      settleUpAmount : "",
+      settleUpAmount: "",
       // you owe people - split equally -- 1
       // people owe you - split equally -- 2
       // you owe people full amount -- 3
@@ -67,10 +67,15 @@ class SplitIt extends Component {
       "Content-Type": `application/json`,
     };
 
+    const finbody = {
+      custId: this.props.custId
+    }
+
     const request = {
-      baseURL: "http://127.0.0.1:8000/transactionList/",
+      baseURL: "http://127.0.0.1:8000/transactionData/",
       headers,
-      method: "get",
+      data : finbody,
+      method: "post",
     };
     const response = await axios(request);
     console.log(response.data);
@@ -149,7 +154,7 @@ class SplitIt extends Component {
     var finalData = data[0];
     finalData.amount = (Math.abs(finalData.amount)).toFixed(1);
     this.setState({
-      settleUpAmount:finalData.amount
+      settleUpAmount: finalData.amount
     })
     console.log(finalData);
     this.settleup(finalData);
@@ -169,17 +174,9 @@ class SplitIt extends Component {
       isLoading: true,
       buttonEnable: false,
     });
-    // var owingOption = this.state.owingOption;
     var totalCustomerCount = this.state.selectedIds.length + 1;
-    // if (owingOption == 1) {
     var individualAmount = this.state.amount / totalCustomerCount;
-    // } else if (owingOption == 2) {
-    //   var individualAmount = -(this.state.amount / totalCustomerCount);
-    // } else if (owingOption == 3) {
-    //   var individualAmount = -this.state.amount;
-    // } else {
-    //   var individualAmount = this.state.amount;
-    // }
+
     var finalbody = [];
 
     this.state.selectedIds.forEach((x) => {
@@ -361,7 +358,7 @@ class SplitIt extends Component {
     }
     if (this.buttonEnable) {
       button = (
-        <button className="button_primary" onClick={this.createSplit} disabled={this.state.amount < 1 || this.state.amount == "" }>
+        <button className="button_primary" onClick={this.createSplit} disabled={this.state.amount < 1 || this.state.amount == ""}>
           {this.state.amount > 0 ? "Split It!" : "Please enter amount"}
         </button>
       );
@@ -428,7 +425,7 @@ class SplitIt extends Component {
             onPopupClose={this.isShowPopup}
             pendingResponse={this.settleUpConfirmBody}
             pathURL="http://127.0.0.1:8000/settleUpConfirm/"
-            amount = {this.state.settleUpAmount}
+            amount={this.state.settleUpAmount}
           ></ModalPopup>
         </div>
         <div></div>
@@ -440,6 +437,7 @@ class SplitIt extends Component {
 const mapStateToProps = (state) => {
   return {
     transactionGlobal: state.transaction.transactionList,
+    custId : state.transaction.custId
   };
 };
-export default connect(mapStateToProps, { updateTransaction })(SplitIt);
+export default connect(mapStateToProps, { updateTransaction, setLoggedInCustomer })(SplitIt);

@@ -11,6 +11,7 @@ import { connect } from "react-redux";
 import {
   updateCompletedMerchantPayment,
   updateTransaction,
+  setLoggedInCustomer
 } from "../Redux/Actions/TransactionsActions";
 import LoadingSpinner from "./LoadingSpinner";
 
@@ -41,6 +42,7 @@ class ListCustomers extends Component {
       refundMassage: "",
       refundLoader: false,
       refundEnable: false,
+      isSplitRecorded:false
     };
 
     this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
@@ -55,8 +57,7 @@ class ListCustomers extends Component {
     this.isShowPopup = this.isShowPopup.bind(this);
     this.handleLapChange = this.handleLapChange.bind(this);
     this.createRefund = this.createRefund.bind(this);
-    this.recordFailedPaymentToSplitIt =
-      this.recordFailedPaymentToSplitIt.bind(this);
+    this.recordFailedPaymentToSplitIt = this.recordFailedPaymentToSplitIt.bind(this);
   }
 
   isShowPopup = (status) => {
@@ -99,7 +100,7 @@ class ListCustomers extends Component {
       var customer = element;
       if (
         customer.ewallet != "" &&
-        customer.id != "cus_5dedc9d323b7928b256317886173bbca"
+        customer.id != this.props.custId
       ) {
         responsecustomers.push(customer);
       }
@@ -127,7 +128,7 @@ class ListCustomers extends Component {
       var customer = element;
       if (
         customer.ewallet != "" &&
-        customer.id != "cus_5dedc9d323b7928b256317886173bbca"
+        customer.id != this.props.custId
       ) {
         responsecustomers.push(customer);
       }
@@ -155,6 +156,7 @@ class ListCustomers extends Component {
     var gpbody = {
       amount: finalamount,
       ids: this.state.selectedIds.filter((x) => x != this.FailedUser),
+      custId: this.props.custId
     };
 
     console.log("finalbody is ", gpbody);
@@ -236,24 +238,14 @@ class ListCustomers extends Component {
     }
   };
   recordFailedPaymentToSplitIt = async () => {
-    // var owingOption = this.state.owingOption;
-    // var individualAmount = (this.state.amount)/
-
-    // var finalbody = [];
-
-    // this.state.selectedIds.forEach((x) => {
-    // var name = this.showName(x);
-    // console.log("SHow name is ***********", name)
     var finalbody = [
       {
         source: this.FailedUser,
         amount: this.state.amountPerUser,
-        destination: "cus_5dedc9d323b7928b256317886173bbca",
+        destination: this.props.custId,
         name: "Mohit",
       },
     ];
-    // finalbody.push(individualBody);
-    // })
     console.log("finalbody is ", finalbody);
     const headers = {
       "Content-Type": `application/json`,
@@ -267,8 +259,10 @@ class ListCustomers extends Component {
     };
     const response = await axios(request);
     console.log(response.data);
-    if (response.status == 201) {
-      await this.getTransactions();
+    if (response.status == 201 || response.status == 200) {
+      this.setState({
+        isSplitRecorded : true
+      })
     }
   };
 
@@ -280,6 +274,7 @@ class ListCustomers extends Component {
     var ewalletpaymentbody = {
       amount: this.state.amount.toString(),
       ids: this.state.selectedMerchant,
+      custId: this.props.custId
     };
 
     console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
@@ -335,7 +330,6 @@ class ListCustomers extends Component {
   };
 
   handleClickMerchant = (e) => {
-    // e.preventDefault();
     console.log(e.target.value);
     this.setState(
       {
@@ -353,16 +347,15 @@ class ListCustomers extends Component {
     let createdGPWIthLoader = "";
     let isMerchantSelected = this.state.selectedMerchant == "" ? false : true;
     let promptToUpdateSplitIt;
-    // if (this.state.selectedMerchant == "") {
     clickedMerchant = "";
     console.log("inside render for merhcant ", this.state.merchantsList);
     merchants = (
       <div className="transaction_list_wrapper">
         <h5>Select Merchant</h5>
         <hr></hr>
-        <ul className="grid_listcustomers" style={{ padding: "5px" }}>
+        <ul className="grid_listcustomers">
           {this.state.merchantsList.map((merchant) => (
-            <label style={{ textAlign: "center" }} key={merchant.ewallet}>
+            <label key={merchant.ewallet}>
               <input
                 type="radio"
                 name="lang"
@@ -453,7 +446,6 @@ class ListCustomers extends Component {
       );
     }
     let button;
-    // if (this.state.selectedIds.length > 2) {
     button = (
       <button
         className="button_primary"
@@ -475,7 +467,6 @@ class ListCustomers extends Component {
         <div className="transaction_list_wrapper">
           <h5>Select Friends</h5>
           <hr></hr>
-          {/* <button onClick={this.makeRequest} label="Get customers">Get list of Friends</button> */}
           <ul className="grid_listcustomers">
             {this.state.customerslist.map((customer) => (
               <label key={customer.id}>
@@ -494,14 +485,6 @@ class ListCustomers extends Component {
       );
     }
 
-    // console.log(
-    //   "ISMERCHANTPAYMENTCOMPLETED",
-    //   this.props.isMerchantPaymentCompleted
-    // );
-    // console.log(
-    //   "ISMERCHANTPAYMENTCOMPLETED******",
-    //   this.state.isFailedUserInList
-    // );
     if (
       this.state.isFailedUserInList &&
       this.props.isMerchantPaymentCompleted
@@ -521,6 +504,12 @@ class ListCustomers extends Component {
           </button>
         </div>
       );
+    }
+    else if(!this.state.isFailedUserInList && this.props.isMerchantPaymentCompleted){
+        promptToUpdateSplitIt = (
+        <div className="transaction_list_wrapper">
+            <p>Your payment was completed</p>
+        </div>)
     }
     // if(this.props.isMerchantPaymentCompleted){
     //   <button>
@@ -551,15 +540,10 @@ class ListCustomers extends Component {
           {createdGPWIthLoader}
 
           {this.state.merchantPaymentStarted &&
-          this.props.merchantPaymentMessage == "" ? (
-            <div className="transaction_list_wrapper">
-              <LoadingSpinner />{" "}
-            </div>
-          ) : this.props.merchantPaymentMessage != "" ? (
-            <div className="transaction_list_wrapper">
+          !this.props.isMerchantPaymentCompleted && 
+          this.props.merchantPaymentMessage == "Payment Declined" 
+          ? (<div className="transaction_list_wrapper">
               {this.props.merchantPaymentMessage}
-              {this.props.merchantPaymentMessage ==
-              "Your Request was cancelled" ? (
                 <div disabled={this.state.refundEnable}>
                   <button
                     className="button_primary"
@@ -567,10 +551,7 @@ class ListCustomers extends Component {
                   >
                     Create Refund{" "}
                   </button>
-                </div>
-              ) : (
-                <div></div>
-              )}
+                </div> 
             </div>
           ) : (
             <div></div>
@@ -588,6 +569,8 @@ class ListCustomers extends Component {
           )}
 
           {promptToUpdateSplitIt}
+          {console.log(this.state.isSplitRecorded,"afesddaw3ersdfcsrbjhkdfcuohbwecdbjhscdsjozxcnk juhsdjnkxjhvsuikzjd")}
+          {this.state.isSplitRecorded ? <div>You split was recorded <br></br> Click on <strong>Go to SplitIt to check</strong></div> : <div></div>}
         </div>
         <div>
           <ModalPopup
@@ -627,9 +610,12 @@ const mapStateToProps = (state) => {
   return {
     isMerchantPaymentCompleted: state.transaction.isMerchantPaymentCompleted,
     merchantPaymentMessage: state.transaction.merchantPaymentMessage,
+    loggedInUser:state.transaction.custId,
+    custId : state.transaction.custId
   };
 };
 export default connect(mapStateToProps, {
   updateTransaction,
   updateCompletedMerchantPayment,
+  setLoggedInCustomer
 })(ListCustomers);

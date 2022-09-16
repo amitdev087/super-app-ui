@@ -13,3 +13,11 @@ export const updateCompletedMerchantPayment = iscompleted => {
         payload: iscompleted,
     }
 }
+
+export const setLoggedInCustomer = custId => {
+    console.log("Inside action",custId);
+    return{
+        type: "SET_LOGGEDIN_USER",
+        payload: custId,
+    }
+}

@@ -19,19 +19,18 @@ class ModalPopup extends Component {
     this.getTransactions = this.getTransactions.bind(this);
   }
 
-  isShowModal = async (status) => {
-    await this.createAcceptRequest();
+  isShowModal = async (status,statusAcceptOrDecline) => {
+    await this.createAcceptRequest(statusAcceptOrDecline);
     this.handleClose();
     this.setState({ showModal: status });
   };
 
   handleClose = () => {
     this.props.onPopupClose(false);
-    this.props.updateCompletedMerchantPayment([false, "Your Request was cancelled"]);
   };
 
-  createAcceptRequest = async () => {
-    this.props.pendingResponse.status = "accept";
+  createAcceptRequest = async (statusAcceptOrDecline) => {
+    this.props.pendingResponse.status = statusAcceptOrDecline == "decline" ? "decline" : "accept";
     console.log("finalbody is ", this.props.pendingResponse);
     const headers = {
       "Content-Type": `application/json`,
@@ -47,7 +46,11 @@ class ModalPopup extends Component {
     console.log(response.data);
     if (response.status == 201 || response.status == 200) {
       this.getTransactions();
-      this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
+      if(this.props.pendingResponse.status == "accept"){
+        this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
+      }
+      else this.props.updateCompletedMerchantPayment([false, "Payment Declined"]);
+
     } else {
       this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
     }
@@ -57,11 +60,16 @@ class ModalPopup extends Component {
     const headers = {
       "Content-Type": `application/json`,
     };
-
+    const finbody = {
+        custId : this.props.custId
+    }
+    
+    console.log("*&*&*&*&**&**&*&*",finbody)
     const request = {
-      baseURL: "http://127.0.0.1:8000/transactionList/",
+      baseURL: "http://127.0.0.1:8000/transactionData/",
       headers,
-      method: "get",
+      data: finbody,
+      method: "post",
     };
     const response = await axios(request);
     console.log(response.data);
@@ -95,10 +103,18 @@ class ModalPopup extends Component {
               <button
                 type="button"
                 className="button_primary"
-                onClick={() => this.isShowModal(true)}
+                onClick={() => this.isShowModal(true,"accept")}
               >
                 {" "}
                 Accept{" "}
+              </button>
+              <button
+                type="button"
+                className="button_primary"
+                color="red"
+                onClick={() => this.isShowModal(true,"decline")}
+              >
+                Decline
               </button>
             </div>
           </Modal.Body>
@@ -110,6 +126,7 @@ class ModalPopup extends Component {
 const mapStateToProps = (state) => {
   return {
     transactionGlobal: state.transaction.transactionList,
+    custId : state.transaction.custId
   };
 };
 export default connect(mapStateToProps, {

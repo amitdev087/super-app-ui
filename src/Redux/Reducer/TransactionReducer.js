@@ -5,7 +5,8 @@ import { act } from "@testing-library/react";
 const initialState = {
     transactionList: [],
     isMerchantPaymentCompleted: false,
-    merchantPaymentMessage:""
+    merchantPaymentMessage:"",
+    custId:"cus_5dedc9d323b7928b256317886173bbca"
 }
 
 export default function (state = initialState, action) {
@@ -17,14 +18,24 @@ export default function (state = initialState, action) {
             return {
                 transactionList: action.payload,
                 isMerchantPaymentCompleted: state.isMerchantPaymentCompleted,
-                merchantPaymentMessage:state.merchantPaymentMessage
+                merchantPaymentMessage:state.merchantPaymentMessage,
+                custId:state.custId
             }
         case "UPDATE_COMPLETED_PAYMENT":
             console.log("State will be updated to ", action.payload);
             return {
                 isMerchantPaymentCompleted: action.payload[0],
                 transactionList: state.transactionList,
-                merchantPaymentMessage:action.payload[1]
+                merchantPaymentMessage:action.payload[1],
+                custId : state.custId
+            }
+        case "SET_LOGGEDIN_USER":
+            console.log("State will be updated to ", action.payload);
+            return {
+                isMerchantPaymentCompleted: state.isMerchantPaymentCompleted,
+                transactionList: state.transactionList,
+                merchantPaymentMessage:state.merchantPaymentMessage,
+                custId:action.payload
             }
 
         default:
