@@ -23,6 +23,7 @@ export default function Login() {
       method: "post",
     };
     const response = await axios(request);
+    console.log(response.data,"custmid of logged in user")
     if ((response.status = 200)) {
         setErrorMessages({ message:"Inavalid User Name or Password" })
     } else {
@@ -35,7 +36,8 @@ export default function Login() {
     event.preventDefault();
 
     var { uname, pass } = document.forms[0];
-    userLogin(uname, pass);
+    console.log(uname,pass,"usesr na,w asn dfjsofj password")
+    userLogin(uname.value, pass.value);
 
     // Find user login info
     //const userData = database.find((user) => user.username === uname.value);
