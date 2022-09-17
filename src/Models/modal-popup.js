@@ -55,12 +55,22 @@ class ModalPopup extends Component {
 
     const response = await axios(request);
     console.log(response.data);
-    if (response.status == 201 || response.status == 200) {
+    if (response.status == 201 || response.status == 200 && this.props.pathURL == "http://127.0.0.1:8000/setTransferResponse/") {
       this.getTransactions();
       if(this.props.pendingResponse.status == "accept"){
         this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
       }
       else this.props.updateCompletedMerchantPayment([false, "Payment Declined"]);
+
+    } else {
+      this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
+    }
+    if (response.status == 201 || response.status == 200 && this.props.pathURL == "http://127.0.0.1:8000/settleUpConfirm/") {
+      this.getTransactions();
+      if(response.data == "accept"){
+        this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
+      }
+      else this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
 
     } else {
       this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);

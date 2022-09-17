@@ -38,6 +38,7 @@ class SplitIt extends Component {
       custId: "",
       settleUpResponseMassage: "",
       showSettleUpResponse: false,
+      merchantPaymentStarted: false,
       // you owe people - split equally -- 1
       // people owe you - split equally -- 2
       // you owe people full amount -- 3
@@ -146,7 +147,8 @@ class SplitIt extends Component {
 
   async settleup(finalbody) {
     this.setState({
-      showSettleUpResponse:false
+      showSettleUpResponse: false,
+      merchantPaymentStarted: true
     })
     console.log("finalbody is ", finalbody);
     const headers = {
@@ -160,19 +162,19 @@ class SplitIt extends Component {
       method: "post",
     };
     const response = await axios(request);
-    if ((response.status = 201)&&(response.data["message"]=="")) {
+    if ((response.status = 201) && (response.data["message"] == "")) {
       this.isShowPopup(true);
       finalbody["id"] = response.data["id"];
       this.settleUpConfirmBody = finalbody;
     }
-  if(((response.status = 201)&&(response.data["message"]!=""))) {
+    if (((response.status = 201) && (response.data["message"] != ""))) {
       this.setState({
         showSettleUpResponse: true,
         settleUpResponseMassage: response.data["message"],
       });
       console.log("mama gav mai dindora pitava do settle up fail ho gaya hai");
     }
-    }
+  }
   handlesettleUp = (e) => {
     //const { value, checked } = e.target;
     console.log(e.target.value);
@@ -426,6 +428,24 @@ class SplitIt extends Component {
         </div>
       );
     }
+
+    let paymentStatusFinal;
+    if (this.state.merchantPaymentStarted) {
+      console.log("Sabki maa ka chiahfuilanhsdlzujkfchseuirdfnhcdnfgcnhd bnsd", this.props.isMerchantPaymentCompleted, this.props.merchantPaymentMessage)
+      if (!this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Failed") {
+        paymentStatusFinal =
+          (
+            <div className="transaction_list_wrapper">
+              {this.props.merchantPaymentMessage}
+            </div>
+          )
+      }
+      else if (this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Succeeded") {
+        paymentStatusFinal = (<div className="transaction_list_wrapper">
+          <p>Your payment was completed</p>
+        </div>)
+      }
+    }
     // }
     return (
       <div><Header />
@@ -471,6 +491,7 @@ class SplitIt extends Component {
                   : "Hide Transactions"}
               </button>
               {transactionsSplit}
+              {paymentStatusFinal}
             </div>
             <div>
               <ModalPopup
@@ -482,14 +503,16 @@ class SplitIt extends Component {
               ></ModalPopup>
             </div>
             {this.state.showSettleUpResponse ? (
-            <div className="transaction_list_wrapper">
-              {this.state.settleUpResponseMassage}
-            </div>
-          ) : (
-            <div></div>
-          )}
+              <div className="transaction_list_wrapper">
+                {this.state.settleUpResponseMassage}
+              </div>
+            ) : (
+              <div></div>
+            )}
+
             <div></div>
           </div>}
+        
       </div>
     );
   }
@@ -499,6 +522,8 @@ const mapStateToProps = (state) => {
   return {
     transactionGlobal: state.transaction.transactionList,
     custId: state.transaction.custId,
+    isMerchantPaymentCompleted: state.transaction.isMerchantPaymentCompleted,
+    merchantPaymentMessage: state.transaction.merchantPaymentMessage,
   };
 };
 export default connect(mapStateToProps, {
