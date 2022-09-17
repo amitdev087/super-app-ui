@@ -97,7 +97,7 @@ class Login extends Component {
     return (
       <div className="app">
         <div className="login-form">
-          {!this.state.isLoggedIn}
+          {this.state.isLoggedIn}
           <div className="title">Sign In</div>
           {renderForm}
           {this.state.isSubmitted ? (
