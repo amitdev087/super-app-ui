@@ -36,6 +36,8 @@ class SplitIt extends Component {
       selectedUserToPay: "",
       settleUpAmount: "",
       custId: "",
+      settleUpResponseMassage: "",
+      showSettleUpResponse: false,
       // you owe people - split equally -- 1
       // people owe you - split equally -- 2
       // you owe people full amount -- 3
@@ -143,6 +145,9 @@ class SplitIt extends Component {
   }
 
   async settleup(finalbody) {
+    this.setState({
+      showSettleUpResponse:false
+    })
     console.log("finalbody is ", finalbody);
     const headers = {
       "Content-Type": `application/json`,
@@ -155,13 +160,19 @@ class SplitIt extends Component {
       method: "post",
     };
     const response = await axios(request);
-    if ((response.status = 201)) {
+    if ((response.status = 201)&&(response.data["message"]=="")) {
       this.isShowPopup(true);
+      finalbody["id"] = response.data["id"];
+      this.settleUpConfirmBody = finalbody;
     }
-
-    finalbody["id"] = response.data["id"];
-    this.settleUpConfirmBody = finalbody;
-  }
+  if(((response.status = 201)&&(response.data["message"]!=""))) {
+      this.setState({
+        showSettleUpResponse: true,
+        settleUpResponseMassage: response.data["message"],
+      });
+      console.log("mama gav mai dindora pitava do settle up fail ho gaya hai");
+    }
+    }
   handlesettleUp = (e) => {
     //const { value, checked } = e.target;
     console.log(e.target.value);
@@ -470,6 +481,13 @@ class SplitIt extends Component {
                 amount={this.state.settleUpAmount}
               ></ModalPopup>
             </div>
+            {this.state.showSettleUpResponse ? (
+            <div className="transaction_list_wrapper">
+              {this.state.settleUpResponseMassage}
+            </div>
+          ) : (
+            <div></div>
+          )}
             <div></div>
           </div>}
       </div>
