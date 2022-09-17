@@ -574,7 +574,7 @@ class ListCustomers extends Component {
                             {createdGPWIthLoader}
 
                             {this.state.merchantPaymentStarted &&
-                                !this.props.isMerchantPaymentCompleted &&
+                                this.props.isMerchantPaymentCompleted &&
                                 this.props.merchantPaymentMessage == "Payment Declined" ? (
                                 <div className="transaction_list_wrapper">
                                     {this.props.merchantPaymentMessage}
@@ -612,6 +612,7 @@ class ListCustomers extends Component {
                             ) : (
                                 <div></div>
                             )}
+
                         </div>
                         <div>
                             <ModalPopup

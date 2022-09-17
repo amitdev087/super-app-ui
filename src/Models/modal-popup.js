@@ -61,7 +61,7 @@ class ModalPopup extends Component {
       }
 
       else {
-        this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
+        this.props.updateCompletedMerchantPayment([true, "Payment Declined"]);
       }
     } 
     if ((response.status == 201 || response.status == 200) && this.props.pathURL == "http://127.0.0.1:8000/settleUpConfirm/") {

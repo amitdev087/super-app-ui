@@ -229,7 +229,7 @@ class Lent extends Component {
     let paymentStatusFinal;
     if (this.state.merchantPaymentStarted) {
       console.log("Sabki maa ka chiahfuilanhsdlzujkfchseuirdfnhcdnfgcnhd bnsd", this.props.isMerchantPaymentCompleted, this.props.merchantPaymentMessage)
-      if (!this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Failed") {
+      if (!this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Declined") {
         paymentStatusFinal =
           (
             <div className="transaction_list_wrapper">
