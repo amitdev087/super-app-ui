@@ -5,13 +5,16 @@ import "../styles/login.css";
 import { Component } from "react";
 import { connect } from "react-redux";
 import { setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
+// import { AsyncStorage } from 'react-native';
+// import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from "@react-native-community/async-storage";
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      errorMessages : "",
-      isSubmitted : ""
-    }
+      errorMessages: "",
+      isSubmitted: "",
+    };
     this.userLogin = this.userLogin.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.renderErrorMessage = this.renderErrorMessage.bind(this);
@@ -35,19 +38,20 @@ class Login extends Component {
       method: "post",
     };
     const response = await axios(request);
-    console.log(response.data, "custmid of logged in user")
+    console.log(response.data, "custmid of logged in user");
     if ((response.status = 200)) {
-      this.props.setLoggedInCustomer(response.data)
+      localStorage.setItem("custId", response.data);
+      this.props.setLoggedInCustomer(localStorage.getItem("custId"));
       this.setState({
-        errorMessages: "Logged In Successfully"
-      })
+        errorMessages: "Logged In Successfully",
+      });
     } else {
       this.setState({
         errorMessages: "Inavalid User Name or Password",
-        isSubmitted : true
-      })
+        isSubmitted: true,
+      });
     }
-    console.log("******************",this.props.loggedInUser);
+    console.log("******************", this.props.loggedInUser);
   };
 
   handleSubmit = (event) => {
@@ -55,11 +59,9 @@ class Login extends Component {
     event.preventDefault();
 
     var { uname, pass } = document.forms[0];
-    console.log(uname, pass, "usesr na,w asn dfjsofj password")
+    console.log(uname, pass, "usesr na,w asn dfjsofj password");
     this.userLogin(uname.value, pass.value);
-
   };
-
 
   // Generate JSX code for error message
   renderErrorMessage = (name) =>
@@ -68,10 +70,12 @@ class Login extends Component {
     );
 
   // JSX code for login form
-  
 
   render() {
-    console.log("******************",this.props.loggedInUser);
+    console.log(
+      "******************customerid of logged in  user",
+      this.props.loggedInUser
+    );
     let renderForm = (
       <div className="form">
         <form onSubmit={this.handleSubmit}>
@@ -92,10 +96,14 @@ class Login extends Component {
       </div>
     );
     return (
-      <div className="app" >
+      <div className="app">
         <div className="login-form">
           <div className="title">Sign In</div>
-          {this.state.isSubmitted ? <div>User is successfully logged in</div> : renderForm}
+          {this.state.isSubmitted ? (
+            <div>User is successfully logged in</div>
+          ) : (
+            renderForm
+          )}
         </div>
       </div>
     );
@@ -108,5 +116,5 @@ const mapStateToProps = (state) => {
   };
 };
 export default connect(mapStateToProps, {
-  setLoggedInCustomer
+  setLoggedInCustomer,
 })(Login);

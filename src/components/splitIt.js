@@ -30,6 +30,7 @@ class SplitIt extends Component {
       responseMessage: "",
       selectedUserToPay: "",
       settleUpAmount: "",
+      custId:"",
       // you owe people - split equally -- 1
       // people owe you - split equally -- 2
       // you owe people full amount -- 3
@@ -58,8 +59,14 @@ class SplitIt extends Component {
     this.setState({ showModalPopup: status });
   };
   componentDidMount() {
-    this.getTransactions();
+    this.setState({
+      custId:localStorage.getItem('custId')
+ },()=>{
+     console.log(this.state.custId,"customer is inside split it ")
+     this.getTransactions();
     this.makeRequest();
+   })
+    
   }
 
   async getTransactions() {
@@ -68,8 +75,10 @@ class SplitIt extends Component {
     };
 
     const finbody = {
-      custId: this.props.custId
+      custId: this.state.custId
     }
+
+    console.log(finbody,"get transaction list of logged in user")
 
     const request = {
       baseURL: "http://127.0.0.1:8000/transactionData/",

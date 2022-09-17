@@ -14,6 +14,7 @@ import {
     setLoggedInCustomer
 } from "../Redux/Actions/TransactionsActions";
 import LoadingSpinner from "./LoadingSpinner";
+import AsyncStorage from "@react-native-community/async-storage";
 
 class ListCustomers extends Component {
     constructor(props) {
@@ -44,6 +45,8 @@ class ListCustomers extends Component {
             refundEnable: false,
             isSplitRecorded: false,
             customerLoads: true,
+            custId:"",
+            
         };
 
         this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
@@ -65,8 +68,15 @@ class ListCustomers extends Component {
         this.setState({ showModalPopup: status });
     };
     async componentDidMount() {
+        this.setState({
+            custId:localStorage.getItem('custId')
+       },()=>{
+           console.log(this.state.custId,"")
+         })
         await this.makeMerchantRequest();
         await this.makeRequest();
+    
+
     }
     async componentDidUpdate() {
         for (var x in this.state.selectedIds) {
@@ -75,11 +85,6 @@ class ListCustomers extends Component {
                     isFailedUserInList: true,
                 });
             }
-            // else {
-            //     this.setState({
-            //         isFailedUserInList: false
-            //     })
-            // }
         }
     }
 
@@ -101,7 +106,7 @@ class ListCustomers extends Component {
             var customer = element;
             if (
                 customer.ewallet != "" &&
-                customer.id != this.props.custId
+                customer.id != this.state.custId
             ) {
                 responsecustomers.push(customer);
             }
@@ -129,8 +134,10 @@ class ListCustomers extends Component {
             var customer = element;
             if (
                 customer.ewallet != "" &&
-                customer.id != this.props.custId
+                customer.id != this.state.custId
             ) {
+                console.log("&#&#&#&#&*@(!&@*#@*****************",this.state.custId)
+                
                 responsecustomers.push(customer);
             }
         });
@@ -157,7 +164,7 @@ class ListCustomers extends Component {
         var gpbody = {
             amount: finalamount,
             ids: this.state.selectedIds.filter((x) => x != this.FailedUser),
-            custId: this.props.custId
+            custId: this.state.custId
         };
 
         console.log("finalbody is ", gpbody);
@@ -243,7 +250,7 @@ class ListCustomers extends Component {
             {
                 source: this.FailedUser,
                 amount: this.state.amountPerUser,
-                destination: this.props.custId,
+                destination: this.state.custId,
                 name: "Mohit",
             },
         ];
@@ -275,7 +282,7 @@ class ListCustomers extends Component {
         var ewalletpaymentbody = {
             amount: this.state.amount.toString(),
             ids: this.state.selectedMerchant,
-            custId: this.props.custId
+            custId: this.state.custId
         };
 
         console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
@@ -619,8 +626,8 @@ const mapStateToProps = (state) => {
     return {
         isMerchantPaymentCompleted: state.transaction.isMerchantPaymentCompleted,
         merchantPaymentMessage: state.transaction.merchantPaymentMessage,
-        loggedInUser: state.transaction.custId,
-        custId: state.transaction.custId
+        // loggedInUser: state.transaction.custId,
+        // custId: state.transaction.custId
     };
 };
 export default connect(mapStateToProps, {
