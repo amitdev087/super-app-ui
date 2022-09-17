@@ -41,12 +41,10 @@ class SalarySplit extends Component {
   owingList = ["Split Salary Equally", "Pay Salary Indiviually "];
   handleClickOwingOption = (e) => {
     //e.preventDefault();
-    console.log(e.target.value);
     this.setState(
       {
         owingOption: e.target.value,
-      },
-      () => console.log("owing option is 👉️", this.state.owingOption)
+      }
     );
   };
 
@@ -55,11 +53,6 @@ class SalarySplit extends Component {
       isLoading: true,
       buttonEnable: false,
     });
-    console.log("inside create salary grpu[");
-    console.log(
-      this.state.isLoading,
-      "isloading  gggggggggggggggggggggggggggggggg"
-    );
     var owingOption = this.state.owingOption;
     var totalCustomerCount = this.state.selectedIds.length;
     if (owingOption == 1) {
@@ -72,7 +65,6 @@ class SalarySplit extends Component {
       amount: individualAmount.toString(),
       ids: this.state.selectedIds,
     };
-    console.log("finalbody is ", gpbody);
     const headers = {
       "Content-Type": `application/json`,
     };
@@ -106,38 +98,11 @@ class SalarySplit extends Component {
         custId: localStorage.getItem("custId"),
       },
       () => {
-        console.log(this.state.custId, "customer is inside split it ");
         this.makeRequest();
       }
     );
     await this.makeRequest();
   }
-
-  // async makeMerchantRequest() {
-  //   console.log("Inside makemerchant");
-  //   const headers = {
-  //     "Content-Type": `application/json`,
-  //   };
-
-  //   const request = {
-  //     baseURL: "http://127.0.0.1:8000/getMerchant/",
-  //     headers,
-  //     method: "get",
-  //   };
-  //   const response = await axios(request);
-  //   console.log(response.data);
-  //   var responsecustomers = [];
-  //   response.data.forEach((element) => {
-  //     var customer = element;
-  //     if (customer.ewallet != "") {
-  //       responsecustomers.push(customer);
-  //     }
-  //   });
-
-  //   this.setState({ merchantsList: responsecustomers }, () => {
-  //     console.log("merchant = ", this.state.merchantsList);
-  //   });
-  // }
 
   async makeRequest() {
     const headers = {
@@ -150,7 +115,6 @@ class SalarySplit extends Component {
       method: "get",
     };
     const response = await axios(request);
-    console.log(response.data);
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
@@ -165,7 +129,6 @@ class SalarySplit extends Component {
         customerslist: responsecustomers.filter((x) => x.id != this.FailedUser),
       },
       () => {
-        console.log("csutomers = ", this.state.customerslist);
       }
     );
   }
@@ -181,7 +144,6 @@ class SalarySplit extends Component {
     } else {
       presentIds = presentIds.filter((x) => x !== value);
     }
-    console.log("present ids are ", presentIds);
     this.setState({
       selectedIds: presentIds,
     });
@@ -192,23 +154,10 @@ class SalarySplit extends Component {
     this.setState({
       amount: e.target.value,
     });
-    console.log("handleClick 👉️", this.state.amount);
   };
 
-  // handleClickMerchant = (e) => {
-  //   e.preventDefault();
-  //   console.log(e.target.value);
-  //   this.setState(
-  //     {
-  //       selectedMerchant: e.target.value,
-  //     },
-  //     () => console.log("merchantClick 👉️", this.state.selectedMerchant)
-  //   );
-  // };
 
   render() {
-    //console.log(this.state.customerslist);
-    //let merchants;
     let clickedMerchant;
     let makePaymentEwallet;
     let transactionsSplit;
@@ -265,7 +214,6 @@ class SalarySplit extends Component {
         </button>
       );
     }
-    console.log("button value is :", this.state.selectedIds > 0);
     let finalamount;
     if (this.state.amount > 0) {
       if (

@@ -25,7 +25,6 @@ class ModalPopup extends Component {
         custId: localStorage.getItem("custId"),
       },
       () => {
-        console.log(this.state.custId, "customer is inside split it ");
       }
     );
   }
@@ -42,7 +41,6 @@ class ModalPopup extends Component {
 
   createAcceptRequest = async (statusAcceptOrDecline) => {
     this.props.pendingResponse.status = statusAcceptOrDecline == "decline" ? "decline" : "accept";
-    console.log("finalbody is ", this.props.pendingResponse);
     const headers = {
       "Content-Type": `application/json`,
     };
@@ -54,7 +52,6 @@ class ModalPopup extends Component {
     };
 
     const response = await axios(request);
-    console.log(response.data);
     if (response.status == 201 || response.status == 200 && this.props.pathURL == "http://127.0.0.1:8000/setTransferResponse/") {
       if (this.props.pendingResponse.status == "accept") {
         this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
@@ -66,7 +63,6 @@ class ModalPopup extends Component {
     } 
     if ((response.status == 201 || response.status == 200) && this.props.pathURL == "http://127.0.0.1:8000/settleUpConfirm/") {
       this.getTransactions();
-      console.log("sent by me 2");
       if (response.data == "accept") {
         this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
       }
@@ -82,7 +78,6 @@ class ModalPopup extends Component {
       custId: this.state.custId
     }
 
-    console.log("*&*&*&*&**&**&*&*", finbody)
     const request = {
       baseURL: "http://127.0.0.1:8000/transactionData/",
       headers,
@@ -90,13 +85,11 @@ class ModalPopup extends Component {
       method: "post",
     };
     const response = await axios(request);
-    console.log(response.data);
     var responseTransactions = [];
     response.data.forEach((element) => {
       var transaction = element;
       responseTransactions.push(transaction);
     });
-    console.log("response transaction is ", responseTransactions);
     this.props.updateTransaction(responseTransactions);
   }
   render() {

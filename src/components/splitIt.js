@@ -72,7 +72,6 @@ class SplitIt extends Component {
         custId: localStorage.getItem("custId"),
       },
       () => {
-        console.log(this.state.custId, "customer is inside split it ");
         this.getTransactions();
         this.makeRequest();
       }
@@ -88,7 +87,6 @@ class SplitIt extends Component {
       custId: this.state.custId,
     };
 
-    console.log(finbody, "get transaction list of logged in user");
 
     const request = {
       baseURL: "http://127.0.0.1:8000/transactionData/",
@@ -97,22 +95,18 @@ class SplitIt extends Component {
       method: "post",
     };
     const response = await axios(request);
-    console.log(response.data);
     var responseTransactions = [];
     response.data.forEach((element) => {
       var transaction = element;
       responseTransactions.push(transaction);
     });
-    console.log("response transaction is ", responseTransactions);
     this.props.updateTransaction(responseTransactions);
 
     this.setState(
       { transactionList: responseTransactions },
       () => {
-        console.log("transactions = ", this.state.transactionList);
       },
       () => {
-        console.log("GLobal transaction is :::", this.props.transactionGlobal);
       }
     );
   }
@@ -128,7 +122,6 @@ class SplitIt extends Component {
       method: "get",
     };
     const response = await axios(request);
-    console.log(response.data);
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
@@ -141,7 +134,6 @@ class SplitIt extends Component {
     });
 
     this.setState({ customerslist: responsecustomers }, () => {
-      console.log("csutomers = ", this.state.customerslist);
     });
   }
 
@@ -150,7 +142,6 @@ class SplitIt extends Component {
       showSettleUpResponse: false,
       merchantPaymentStarted: true
     })
-    console.log("finalbody is ", finalbody);
     const headers = {
       "Content-Type": `application/json`,
     };
@@ -172,12 +163,10 @@ class SplitIt extends Component {
         showSettleUpResponse: true,
         settleUpResponseMassage: response.data["message"],
       });
-      console.log("mama gav mai dindora pitava do settle up fail ho gaya hai");
     }
   }
   handlesettleUp = (e) => {
     //const { value, checked } = e.target;
-    console.log(e.target.value);
     var data = e.target.value;
     var transactionData = this.props.transactionGlobal.filter(
       (x) => x.source == data
@@ -187,9 +176,7 @@ class SplitIt extends Component {
     this.setState({
       settleUpAmount: finalData.amount,
     });
-    console.log(finalData);
     this.settleup(finalData);
-    // console.log(checked,"inside handleSettle")
   };
 
   showName = (x) => {
@@ -212,7 +199,6 @@ class SplitIt extends Component {
 
     this.state.selectedIds.forEach((x) => {
       var name = this.showName(x);
-      console.log("SHow name is ***********", name);
       var individualBody = {
         source: x,
         amount: individualAmount,
@@ -222,7 +208,6 @@ class SplitIt extends Component {
       };
       finalbody.push(individualBody);
     });
-    console.log("finalbody is ", finalbody);
     const headers = {
       "Content-Type": `application/json`,
     };
@@ -234,7 +219,6 @@ class SplitIt extends Component {
       method: "post",
     };
     const response = await axios(request);
-    console.log(response.data);
     if (response.status == 201) {
       await this.getTransactions();
       this.setState({
@@ -258,7 +242,6 @@ class SplitIt extends Component {
     } else {
       presentIds = presentIds.filter((x) => x !== value);
     }
-    console.log("present ids are ", presentIds);
     this.setState({
       selectedIds: presentIds,
     });
@@ -266,12 +249,10 @@ class SplitIt extends Component {
 
   handleClickOwingOption = (e) => {
     e.preventDefault();
-    console.log(e.target.value);
     this.setState(
       {
         selectedUserToPay: e.target.value,
-      },
-      () => console.log("owing option is 👉️", this.state.owingOption)
+      }
     );
   };
 
@@ -280,7 +261,6 @@ class SplitIt extends Component {
     this.setState({
       amount: e.target.value,
     });
-    console.log("handleClick 👉️", this.state.amount);
   };
   handleShowTransactions = (e) => {
     e.preventDefault();
@@ -288,7 +268,6 @@ class SplitIt extends Component {
     this.setState({
       showTransaction: !showHide,
     });
-    // console.log('handleClick 👉️', this.state.amount);
   };
 
   checkOwes(sentAmount) {
@@ -314,7 +293,6 @@ class SplitIt extends Component {
   }
 
   render() {
-    console.log(this.state.customerslist);
     let merchants;
     let clickedMerchant;
     let makePaymentEwallet;
@@ -400,7 +378,6 @@ class SplitIt extends Component {
         </button>
       );
     }
-    console.log("button value is :", this.state.selectedIds > 0);
     let finalamount;
     // if (this.state.amount > 0) {
 
@@ -431,7 +408,6 @@ class SplitIt extends Component {
 
     let paymentStatusFinal;
     if (this.state.merchantPaymentStarted) {
-      console.log("Sabki maa ka chiahfuilanhsdlzujkfchseuirdfnhcdnfgcnhd bnsd", this.props.isMerchantPaymentCompleted, this.props.merchantPaymentMessage)
       if (!this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Failed") {
         paymentStatusFinal =
           (

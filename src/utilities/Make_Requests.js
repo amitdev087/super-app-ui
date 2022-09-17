@@ -51,12 +51,10 @@ function sign(method, urlPath, salt, timestamp, body) {
         }
 
         let toSign = method.toLowerCase() + urlPath + salt + timestamp + accessKey + secretKey + bodyString;
-        log && console.log(`toSign: ${toSign}`);
 
         let hash = crypto.createHmac('sha256', secretKey);
         hash.update(toSign);
         const signature = Buffer.from(hash.digest("hex")).toString("base64")
-        log && console.log(`signature: ${signature}`);
 
         return signature;
     }
@@ -88,7 +86,6 @@ async function httpRequest(options, body) {
                 bodyString = bodyString == "{}" ? "" : bodyString;
             }
 
-            log && console.log(`httpRequest options: ${JSON.stringify(options)}`);
             const req = https.request(options, (res) => {
                 let response = {
                     statusCode: res.statusCode,
@@ -103,7 +100,6 @@ async function httpRequest(options, body) {
                 res.on('end', () => {
 
                     response.body = response.body ? JSON.parse(response.body) : {}
-                    log && console.log(`httpRequest response: ${JSON.stringify(response)}`);
 
                     if (response.statusCode !== 200) {
                         return reject(response);

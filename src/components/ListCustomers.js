@@ -74,7 +74,6 @@ class ListCustomers extends Component {
                 custId: localStorage.getItem("custId"),
             },
             () => {
-                console.log(this.state.custId, "");
             }
         );
         await this.makeMerchantRequest();
@@ -91,7 +90,6 @@ class ListCustomers extends Component {
     }
 
     async makeMerchantRequest() {
-        console.log("Inside makemerchant");
         const headers = {
             "Content-Type": `application/json`,
         };
@@ -102,7 +100,6 @@ class ListCustomers extends Component {
             method: "get",
         };
         const response = await axios(request);
-        console.log(response.data);
         var responsecustomers = [];
         response.data.forEach((element) => {
             var customer = element;
@@ -112,7 +109,6 @@ class ListCustomers extends Component {
         });
 
         this.setState({ merchantsList: responsecustomers }, () => {
-            console.log("merchant = ", this.state.merchantsList);
         });
     }
 
@@ -127,13 +123,10 @@ class ListCustomers extends Component {
             method: "get",
         };
         const response = await axios(request);
-        console.log(response.data);
         var responsecustomers = [];
         response.data["data"].forEach((element) => {
             var customer = element;
             if (customer.ewallet != "" && customer.id != this.state.custId) {
-                console.log("&#&#&#&#&*@(!&@*#@*****************", this.state.custId);
-
                 responsecustomers.push(customer);
             }
         });
@@ -141,7 +134,6 @@ class ListCustomers extends Component {
         this.setState(
             { customerslist: responsecustomers, customerLoads: false },
             () => {
-                console.log("csutomers = ", this.state.customerslist);
             }
         );
     }
@@ -166,7 +158,6 @@ class ListCustomers extends Component {
             custId: this.state.custId,
         };
 
-        console.log("finalbody is ", gpbody);
         const headers = {
             "Content-Type": `application/json`,
         };
@@ -188,8 +179,6 @@ class ListCustomers extends Component {
             }
         }
 
-        console.log("selectedIds are ************** ", this.state.selectedIds);
-        console.log(response.data, "response data for whole gruop payment");
         var gpid = response.data;
         if (response.status == 200 || response.status == 201) {
             this.setState(
@@ -203,11 +192,6 @@ class ListCustomers extends Component {
                     amountPerUser: this.state.amount / totalCustomerCount,
                 },
                 () => {
-                    console.log("gpbody is *******", gpMembers);
-                    console.log(
-                        this.state.groupId,
-                        "group id for created geoup apy dj fdofkdjfkdhflh"
-                    );
                 }
             );
         } else {
@@ -218,14 +202,12 @@ class ListCustomers extends Component {
                 responseMessage: "Failed to create payment",
             });
         }
-        // console.log(this.state.groupId,"group id for created geoup apy dj fdofkdjfkdhflh")
     };
 
     createRefund = async () => {
         this.setState({ refundLoader: true, refundEnable: true });
         var finalBody = {};
         finalBody["id"] = this.state.groupId;
-        console.log(finalBody, "refundBpdy us sudf dof df ");
         const headers = {
             "Content-Type": `application/json`,
         };
@@ -253,7 +235,6 @@ class ListCustomers extends Component {
                 name: "Mohit",
             },
         ];
-        console.log("finalbody is ", finalbody);
         const headers = {
             "Content-Type": `application/json`,
         };
@@ -265,7 +246,6 @@ class ListCustomers extends Component {
             method: "post",
         };
         const response = await axios(request);
-        console.log(response.data);
         if (response.status == 201 || response.status == 200) {
             this.setState({
                 isSplitRecorded: true,
@@ -284,7 +264,6 @@ class ListCustomers extends Component {
             custId: this.state.custId,
         };
 
-        console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
         const headers = {
             "Content-Type": `application/json`,
         };
@@ -297,9 +276,7 @@ class ListCustomers extends Component {
         };
 
         const response = await axios(request);
-        console.log(response.data);
         this.setState({ pendingResponse: response.data }, () => {
-            console.log(this.state.pendingResponse);
         });
         if ((response.status = 200)) {
             this.isShowPopup(true);
@@ -315,7 +292,6 @@ class ListCustomers extends Component {
         } else {
             presentIds = presentIds.filter((x) => x !== value);
         }
-        console.log("present ids are ", presentIds);
         this.setState({
             selectedIds: presentIds,
         });
@@ -325,7 +301,6 @@ class ListCustomers extends Component {
         this.setState({
             amount: e.target.value,
         });
-        console.log("handleClick 👉️", this.state.amount);
     };
 
     handleLapChange = (lap) => {
@@ -333,21 +308,17 @@ class ListCustomers extends Component {
             this.setState({
                 showSpinner: false,
             });
-        else console.log("Running!! Lap:", lap.actualLap);
     };
 
     handleClickMerchant = (e) => {
-        console.log(e.target.value);
         this.setState(
             {
                 selectedMerchant: e.target.value,
-            },
-            () => console.log("merchantClick 👉️", this.state.selectedMerchant)
+            }
         );
     };
 
     render() {
-        console.log(this.state.customerslist);
         let merchants;
         let clickedMerchant;
         let makePaymentEwallet;
@@ -355,7 +326,6 @@ class ListCustomers extends Component {
         let isMerchantSelected = this.state.selectedMerchant == "" ? false : true;
         let promptToUpdateSplitIt;
         clickedMerchant = "";
-        console.log("inside render for merhcant ", this.state.merchantsList);
         merchants = (
             <div className="transaction_list_wrapper">
                 <h5>Select Merchant</h5>
@@ -467,7 +437,6 @@ class ListCustomers extends Component {
             </button>
         );
         // }
-        console.log("button value is :", this.state.selectedIds > 0);
         let finalamount;
         if (this.state.amount > 0) {
             if (
@@ -538,7 +507,6 @@ class ListCustomers extends Component {
         return (
             <div>
                 <Header />
-                {console.log(this.state.custId, "-------------------------------------------")}
                 {this.state.custId == "" || this.state.custId == null || this.state.custId == undefined
                     ? <div className="login-form">
                         <div>Please login</div>
@@ -600,10 +568,6 @@ class ListCustomers extends Component {
                             )}
 
                             {promptToUpdateSplitIt}
-                            {console.log(
-                                this.state.isSplitRecorded,
-                                "afesddaw3ersdfcsrbjhkdfcuohbwecdbjhscdsjozxcnk juhsdjnkxjhvsuikzjd"
-                            )}
                             {this.state.isSplitRecorded ? (
                                 <div>
                                     You split was recorded <br></br> Click on{" "}

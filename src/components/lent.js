@@ -62,7 +62,6 @@ class Lent extends Component {
     } else {
       presentIds = presentIds.filter((x) => x !== value);
     }
-    console.log("present ids are ", presentIds);
     this.setState({
       selectedIds: presentIds,
     });
@@ -73,7 +72,6 @@ class Lent extends Component {
         custId: localStorage.getItem("custId"),
       },
       () => {
-        console.log(this.state.custId, "");
       }
     );
     // await this.makeMerchantRequest();
@@ -90,13 +88,10 @@ class Lent extends Component {
       method: "get",
     };
     const response = await axios(request);
-    console.log(response.data);
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
       if (customer.ewallet != "" && customer.id != this.state.custId) {
-        console.log("&#&#&#&#&*@(!&@*#@*****************", this.state.custId);
-
         responsecustomers.push(customer);
       }
     });
@@ -105,17 +100,14 @@ class Lent extends Component {
       // { customerslist: responsecustomers, customerLoads: false },
       { customerslist: responsecustomers.filter((x) => x.id != this.FailedUser), customerLoads: false },
       () => {
-        console.log("csutomers = ", this.state.customerslist);
       }
     );
   }
   handleClickMerchant = (e) => {
-    console.log(e.target.value);
     this.setState(
       {
         selectedMerchant: e.target.value,
-      },
-      () => console.log("merchantClick 👉️", this.state.selectedMerchant)
+      }
     );
   };
   makePaymentEwallet = async () => {
@@ -129,7 +121,6 @@ class Lent extends Component {
       custId: this.state.custId,
     };
 
-    console.log("finalbody ewalletpaymentbody is ", ewalletpaymentbody);
     const headers = {
       "Content-Type": `application/json`,
     };
@@ -142,12 +133,10 @@ class Lent extends Component {
     };
 
     const response = await axios(request);
-    console.log(response.data);
 
     if ((response.status = 201) && (response.data["message"] == "")) {
       this.isShowPopup(true);
       this.setState({ pendingResponse: response.data }, () => {
-        console.log(this.state.pendingResponse);
       });
     }
     if (((response.status = 201) && (response.data["message"] != ""))) {
@@ -155,7 +144,6 @@ class Lent extends Component {
         showSettleUpResponse: true,
         settleUpResponseMassage: response.data["message"],
       });
-      console.log("mama gav mai dindora pitava do settle up fail ho gaya hai");
     }
   };
   recordFailedPaymentToSplitIt = async () => {
@@ -167,7 +155,6 @@ class Lent extends Component {
         name: "Mohit",
       },
     ];
-    console.log("finalbody is ", finalbody);
     const headers = {
       "Content-Type": `application/json`,
     };
@@ -179,7 +166,6 @@ class Lent extends Component {
       method: "post",
     };
     const response = await axios(request);
-    console.log(response.data);
     if (response.status == 201 || response.status == 200) {
       this.setState({
         isSplitRecorded: true,
@@ -195,7 +181,6 @@ class Lent extends Component {
     this.setState({
       amount: e.target.value,
     });
-    console.log("handleClick 👉️", this.state.amount);
   };
   render() {
     let clickedMerchant;
@@ -279,7 +264,6 @@ class Lent extends Component {
 
     let paymentStatusFinal;
     if (this.state.merchantPaymentStarted) {
-      console.log("Sabki maa ka chiahfuilanhsdlzujkfchseuirdfnhcdnfgcnhd bnsd", this.props.isMerchantPaymentCompleted, this.props.merchantPaymentMessage)
       if (this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Declined" && !this.state.showSettleUpResponse) {
         paymentStatusFinal =
           (
@@ -333,10 +317,6 @@ class Lent extends Component {
               <div></div>
             )}
             {promptToUpdateSplitIt}
-            {console.log(
-              this.state.isSplitRecorded,
-              "afesddaw3ersdfcsrbjhkdfcuohbwecdbjhscdsjozxcnk juhsdjnkxjhvsuikzjd"
-            )}
             {this.state.isSplitRecorded ? (
               <div>
                 You split was recorded <br></br> Click on{" "}

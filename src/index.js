@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Routes, Route, Link, BrowserRouter as Router } from "react-router-dom";
-import Make_payment from "./components/MakePayments";
 import ListCustomers from "./components/ListCustomers";
 import SplitIt from "./components/splitIt";
 import SalarySplit from "./components/SalarySplit";

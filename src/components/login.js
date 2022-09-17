@@ -25,7 +25,6 @@ class Login extends Component {
     finalBody["name"] = uname;
     finalBody["password"] = pass;
 
-    console.log(finalBody, "Login final body&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& ");
     const headers = {
       "Content-Type": `application/json`,
     };
@@ -37,7 +36,6 @@ class Login extends Component {
       method: "post",
     };
     const response = await axios(request);
-    console.log(response.data, "custmid of logged in user");
     if (response.status = 200 && response.data != -1) {
       localStorage.setItem("custId", response.data);
       this.setState({
@@ -50,7 +48,6 @@ class Login extends Component {
         isSubmitted: true,
       });
     }
-    console.log("******************", this.props.loggedInUser);
   };
 
   handleSubmit = (event) => {
@@ -58,7 +55,6 @@ class Login extends Component {
     event.preventDefault();
 
     var { uname, pass } = document.forms[0];
-    console.log(uname, pass, "usesr na,w asn dfjsofj password");
     this.userLogin(uname.value, pass.value);
   };
 
@@ -71,10 +67,6 @@ class Login extends Component {
   // JSX code for login form
 
   render() {
-    console.log(
-      "******************customerid of logged in  user",
-      this.props.loggedInUser
-    );
     let renderForm = (
       <div className="form">
         <form onSubmit={this.handleSubmit}>

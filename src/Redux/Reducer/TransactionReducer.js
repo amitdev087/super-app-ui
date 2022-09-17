@@ -10,9 +10,6 @@ const initialState = {
 }
 
 export default function (state = initialState, action) {
-    console.log("INside reducer", action.type);
-    console.log("State inside reducer is ", state.transactionList);
-    console.log("received state is ", action.payload);
     switch (action.type) {
         case "UPDATE_TRANSACTION":
             return {
@@ -22,7 +19,6 @@ export default function (state = initialState, action) {
                 custId:state.custId
             }
         case "UPDATE_COMPLETED_PAYMENT":
-            console.log("State will be updated to ", action.payload);
             return {
                 isMerchantPaymentCompleted: action.payload[0],
                 transactionList: state.transactionList,
@@ -30,7 +26,6 @@ export default function (state = initialState, action) {
                 custId : state.custId
             }
         case "SET_LOGGEDIN_USER":
-            console.log("State will be updated to ", action.payload);
             return {
                 isMerchantPaymentCompleted: state.isMerchantPaymentCompleted,
                 transactionList: state.transactionList,
