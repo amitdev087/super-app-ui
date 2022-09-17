@@ -4,16 +4,15 @@ import axios from "axios";
 import "../styles/login.css";
 import { Component } from "react";
 import { connect } from "react-redux";
+import { Navigate } from "react-router-dom";
 import { setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
-// import { AsyncStorage } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage'
-import AsyncStorage from "@react-native-community/async-storage";
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
       errorMessages: "",
       isSubmitted: "",
+      isLoggedIn: ""
     };
     this.userLogin = this.userLogin.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -39,11 +38,11 @@ class Login extends Component {
     };
     const response = await axios(request);
     console.log(response.data, "custmid of logged in user");
-    if ((response.status = 200)) {
+    if (response.status = 200 && response.data != -1) {
       localStorage.setItem("custId", response.data);
-      this.props.setLoggedInCustomer(localStorage.getItem("custId"));
       this.setState({
         errorMessages: "Logged In Successfully",
+        isLoggedIn: true
       });
     } else {
       this.setState({
@@ -98,13 +97,16 @@ class Login extends Component {
     return (
       <div className="app">
         <div className="login-form">
+          {!this.state.isLoggedIn}
           <div className="title">Sign In</div>
+          {renderForm}
           {this.state.isSubmitted ? (
-            <div>User is successfully logged in</div>
+            <div>{this.state.errorMessages}</div>
           ) : (
-            renderForm
+            <div></div>
           )}
         </div>
+        {this.state.isLoggedIn ? <Navigate replace to="/listcustomers" /> : <div></div>}
       </div>
     );
   }

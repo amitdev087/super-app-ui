@@ -9,6 +9,7 @@ import "../styles/salarySplit.css";
 import LoadingSpinner from "./LoadingSpinner";
 import { setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
 import { connect } from "react-redux";
+import Header from "./header";
 
 class SalarySplit extends Component {
   constructor(props) {
@@ -149,7 +150,8 @@ class SalarySplit extends Component {
     });
 
     this.setState(
-      { customerLoads:false,
+      {
+        customerLoads: false,
         customerslist: responsecustomers.filter((x) => x.id != this.FailedUser),
       },
       () => {
@@ -259,31 +261,31 @@ class SalarySplit extends Component {
       if (
         this.state.customerLoads
           ? (finalamount = (
-              <div className="transaction_list_wrapper">
-                <LoadingSpinner />
-              </div>
-            ))
+            <div className="transaction_list_wrapper">
+              <LoadingSpinner />
+            </div>
+          ))
           : (finalamount = (
-              <div className="transaction_list_wrapper">
-                <h5>Select Friends</h5>
-                <hr></hr>
-                {/* <button onClick={this.makeRequest} label="Get customers">Get list of Friends</button> */}
-                <ul className="grid_listcustomers">
-                  {this.state.customerslist.map((customer) => (
-                    <label key={customer.id}>
-                      <input
-                        type="checkbox"
-                        name="lang"
-                        value={customer.id}
-                        onChange={this.handleChange}
-                      />{" "}
-                      {customer.name}
-                    </label>
-                  ))}
-                </ul>
-                <div>{button}</div>
-              </div>
-            ))
+            <div className="transaction_list_wrapper">
+              <h5>Select Friends</h5>
+              <hr></hr>
+              {/* <button onClick={this.makeRequest} label="Get customers">Get list of Friends</button> */}
+              <ul className="grid_listcustomers">
+                {this.state.customerslist.map((customer) => (
+                  <label key={customer.id}>
+                    <input
+                      type="checkbox"
+                      name="lang"
+                      value={customer.id}
+                      onChange={this.handleChange}
+                    />{" "}
+                    {customer.name}
+                  </label>
+                ))}
+              </ul>
+              <div>{button}</div>
+            </div>
+          ))
       );
     }
     if (
@@ -301,26 +303,28 @@ class SalarySplit extends Component {
       );
     }
     return (
-      <div className="container" style={{ padding: "2rem", width: "60%" }}>
-        <div>
-          <div disabled={!this.state.buttonEnable}>
-            {transactionsSplit}
-            {clickedMerchant}
-            {finalamount}
-          </div>
-
-          {this.state.responseMessage != "" || this.state.isLoading == true ? (
-            <div className="transaction_list_wrapper">
-              {this.state.isLoading ? (
-                <LoadingSpinner />
-              ) : (
-                <p>{this.state.responseMessage}</p>
-              )}
+      <div><Header />
+        <div className="container" style={{ padding: "2rem", width: "60%" }}>
+          <div>
+            <div disabled={!this.state.buttonEnable}>
+              {transactionsSplit}
+              {clickedMerchant}
+              {finalamount}
             </div>
-          ) : (
-            <div></div>
-          )}
-          {/* {makePaymentEwallet} */}
+
+            {this.state.responseMessage != "" || this.state.isLoading == true ? (
+              <div className="transaction_list_wrapper">
+                {this.state.isLoading ? (
+                  <LoadingSpinner />
+                ) : (
+                  <p>{this.state.responseMessage}</p>
+                )}
+              </div>
+            ) : (
+              <div></div>
+            )}
+            {/* {makePaymentEwallet} */}
+          </div>
         </div>
       </div>
     );

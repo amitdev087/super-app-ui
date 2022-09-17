@@ -20,14 +20,12 @@ const store = createStore(allReducers);
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
-    <Header/>
     <Router>
       <Routes>
-        <Route path="/" element={<ListCustomers />}></Route>
+        <Route index path="/" element={<ListCustomers />}></Route>
         <Route path="/listcustomers" element={<ListCustomers />}></Route>
         <Route path="/splitIt" element={<SplitIt />}></Route>
         <Route path="/salarySplit" element={<SalarySplit />}></Route>
-        <Route path="/header" element={<Header />}></Route>
         <Route path="/login" element={<Login />}></Route>
       </Routes>
     </Router>
