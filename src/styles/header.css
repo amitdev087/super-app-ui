@@ -19,3 +19,7 @@
   background-color: #fff;
   color: black;
 }
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+}

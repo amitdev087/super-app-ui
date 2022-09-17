@@ -12,6 +12,7 @@ import {
 } from "../Redux/Actions/TransactionsActions";
 import LoadingSpinner from "./LoadingSpinner";
 import Header from "./header";
+import { Link } from "react-router-dom";
 
 class SplitIt extends Component {
   constructor(props) {
@@ -417,46 +418,60 @@ class SplitIt extends Component {
     // }
     return (
       <div><Header />
-        <div className="container" style={{ padding: "2rem", width: "60%" }}>
-          <div>
-            <div disabled={!this.state.buttonEnable}>
-              {clickedMerchant}
-              {splitType}
-              {merchants}
-              {finalamount}
-            </div>
-            {this.state.responseMessage != "" || this.state.isLoading == true ? (
-              <div className="transaction_list_wrapper">
-                {this.state.isLoading ? (
-                  <LoadingSpinner />
-                ) : (
-                  <p>{this.state.responseMessage}</p>
-                )}
-              </div>
-            ) : (
-              <div></div>
-            )}
-            <button
-              className="button_primary"
-              onClick={this.handleShowTransactions}
-            >
-              {!this.state.showTransaction
-                ? "View Transactions"
-                : "Hide Transactions"}
+        {this.state.custId == "" || this.state.custId == null || this.state.custId == undefined
+          ? <div className="login-form">
+            <div>Please login</div>
+            <button className="button_primary" style={{ width: "95%" }}>
+              <Link
+                to={{
+                  pathname: "/login",
+                }}
+              >
+                Go to Login
+              </Link>
             </button>
-            {transactionsSplit}
           </div>
-          <div>
-            <ModalPopup
-              showModalPopup={this.state.showModalPopup}
-              onPopupClose={this.isShowPopup}
-              pendingResponse={this.settleUpConfirmBody}
-              pathURL="http://127.0.0.1:8000/settleUpConfirm/"
-              amount={this.state.settleUpAmount}
-            ></ModalPopup>
-          </div>
-          <div></div>
-        </div>
+          :
+          <div className="container" style={{ padding: "2rem", width: "60%" }}>
+            <div>
+              <div disabled={!this.state.buttonEnable}>
+                {clickedMerchant}
+                {splitType}
+                {merchants}
+                {finalamount}
+              </div>
+              {this.state.responseMessage != "" || this.state.isLoading == true ? (
+                <div className="transaction_list_wrapper">
+                  {this.state.isLoading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <p>{this.state.responseMessage}</p>
+                  )}
+                </div>
+              ) : (
+                <div></div>
+              )}
+              <button
+                className="button_primary"
+                onClick={this.handleShowTransactions}
+              >
+                {!this.state.showTransaction
+                  ? "View Transactions"
+                  : "Hide Transactions"}
+              </button>
+              {transactionsSplit}
+            </div>
+            <div>
+              <ModalPopup
+                showModalPopup={this.state.showModalPopup}
+                onPopupClose={this.isShowPopup}
+                pendingResponse={this.settleUpConfirmBody}
+                pathURL="http://127.0.0.1:8000/settleUpConfirm/"
+                amount={this.state.settleUpAmount}
+              ></ModalPopup>
+            </div>
+            <div></div>
+          </div>}
       </div>
     );
   }

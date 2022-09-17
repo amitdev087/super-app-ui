@@ -144,7 +144,7 @@ class SalarySplit extends Component {
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
-      if (customer.ewallet != "" && customer.id != this.state.custId) {
+      if (customer.ewallet != "" && customer.id != this.props.custId) {
         responsecustomers.push(customer);
       }
     });
@@ -304,28 +304,42 @@ class SalarySplit extends Component {
     }
     return (
       <div><Header />
-        <div className="container" style={{ padding: "2rem", width: "60%" }}>
-          <div>
-            <div disabled={!this.state.buttonEnable}>
-              {transactionsSplit}
-              {clickedMerchant}
-              {finalamount}
-            </div>
-
-            {this.state.responseMessage != "" || this.state.isLoading == true ? (
-              <div className="transaction_list_wrapper">
-                {this.state.isLoading ? (
-                  <LoadingSpinner />
-                ) : (
-                  <p>{this.state.responseMessage}</p>
-                )}
-              </div>
-            ) : (
-              <div></div>
-            )}
-            {/* {makePaymentEwallet} */}
+        {this.state.custId == "" || this.state.custId == null || this.state.custId == undefined
+          ? <div className="login-form">
+            <div>Please login</div>
+            <button className="button_primary" style={{ width: "95%" }}>
+              <Link
+                to={{
+                  pathname: "/login",
+                }}
+              >
+                Go to Login
+              </Link>
+            </button>
           </div>
-        </div>
+          :
+          <div className="container" style={{ padding: "2rem", width: "60%" }}>
+            <div>
+              <div disabled={!this.state.buttonEnable}>
+                {transactionsSplit}
+                {clickedMerchant}
+                {finalamount}
+              </div>
+
+              {this.state.responseMessage != "" || this.state.isLoading == true ? (
+                <div className="transaction_list_wrapper">
+                  {this.state.isLoading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <p>{this.state.responseMessage}</p>
+                  )}
+                </div>
+              ) : (
+                <div></div>
+              )}
+              {/* {makePaymentEwallet} */}
+            </div>
+          </div>}
       </div>
     );
   }

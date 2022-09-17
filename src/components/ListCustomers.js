@@ -4,7 +4,7 @@ import CryptoJS from "crypto-js";
 import axios from "axios";
 import "react-bootstrap";
 import SplitIt from "./splitIt";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import "../styles/splitpay.css";
 import ReactSpinnerTimer from "react-spinner-timer";
 import { connect } from "react-redux";
@@ -538,97 +538,113 @@ class ListCustomers extends Component {
         return (
             <div>
                 <Header />
-                <div className="container" style={{ padding: "2rem", width: "60%" }}>
-                    <div>
-                        <div disabled={!this.state.buttonEnable}>
-                            {merchants}
-                            {clickedMerchant}
-                            {finalamount}
-                        </div>
-                        {this.state.responseMessage != "" || this.state.isLoading == true ? (
-                            <div className="transaction_list_wrapper">
-                                {this.state.isLoading ? (
-                                    <LoadingSpinner />
-                                ) : (
-                                    <p>{this.state.responseMessage}</p>
-                                )}
+                {console.log(this.state.custId, "-------------------------------------------")}
+                {this.state.custId == "" || this.state.custId == null || this.state.custId == undefined
+                    ? <div className="login-form">
+                        <div>Please login</div>
+                        <button className="button_primary" style={{ width: "95%" }}>
+                            <Link
+                                to={{
+                                    pathname: "/login",
+                                }}
+                            >
+                                Go to Login
+                            </Link>
+                        </button>
+                    </div>
+                    : <div className="container" style={{ padding: "2rem", width: "60%" }}>
+                        <div>
+                            <div disabled={!this.state.buttonEnable}>
+                                {merchants}
+                                {clickedMerchant}
+                                {finalamount}
                             </div>
-                        ) : (
-                            <div></div>
-                        )}
-
-                        {createdGPWIthLoader}
-
-                        {this.state.merchantPaymentStarted &&
-                            !this.props.isMerchantPaymentCompleted &&
-                            this.props.merchantPaymentMessage == "Payment Declined" ? (
-                            <div className="transaction_list_wrapper">
-                                {this.props.merchantPaymentMessage}
-                                <div disabled={this.state.refundEnable}>
-                                    <button className="button_primary" onClick={this.createRefund}>
-                                        Create Refund{" "}
-                                    </button>
+                            {this.state.responseMessage != "" || this.state.isLoading == true ? (
+                                <div className="transaction_list_wrapper">
+                                    {this.state.isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        <p>{this.state.responseMessage}</p>
+                                    )}
                                 </div>
-                            </div>
-                        ) : (
-                            <div></div>
-                        )}
-                        {this.state.refundEnable ? (
-                            <div className="transaction_list_wrapper">
-                                {this.state.refundLoader ? (
-                                    <LoadingSpinner />
-                                ) : (
-                                    <p>{this.state.refundMassage}</p>
-                                )}
-                            </div>
-                        ) : (
-                            <div></div>
-                        )}
+                            ) : (
+                                <div></div>
+                            )}
 
-                        {promptToUpdateSplitIt}
-                        {console.log(
-                            this.state.isSplitRecorded,
-                            "afesddaw3ersdfcsrbjhkdfcuohbwecdbjhscdsjozxcnk juhsdjnkxjhvsuikzjd"
-                        )}
-                        {this.state.isSplitRecorded ? (
-                            <div>
-                                You split was recorded <br></br> Click on{" "}
-                                <strong>Go to SplitIt to check</strong>
-                            </div>
-                        ) : (
-                            <div></div>
-                        )}
+                            {createdGPWIthLoader}
+
+                            {this.state.merchantPaymentStarted &&
+                                !this.props.isMerchantPaymentCompleted &&
+                                this.props.merchantPaymentMessage == "Payment Declined" ? (
+                                <div className="transaction_list_wrapper">
+                                    {this.props.merchantPaymentMessage}
+                                    <div disabled={this.state.refundEnable}>
+                                        <button className="button_primary" onClick={this.createRefund}>
+                                            Create Refund{" "}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div></div>
+                            )}
+                            {this.state.refundEnable ? (
+                                <div className="transaction_list_wrapper">
+                                    {this.state.refundLoader ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        <p>{this.state.refundMassage}</p>
+                                    )}
+                                </div>
+                            ) : (
+                                <div></div>
+                            )}
+
+                            {promptToUpdateSplitIt}
+                            {console.log(
+                                this.state.isSplitRecorded,
+                                "afesddaw3ersdfcsrbjhkdfcuohbwecdbjhscdsjozxcnk juhsdjnkxjhvsuikzjd"
+                            )}
+                            {this.state.isSplitRecorded ? (
+                                <div>
+                                    You split was recorded <br></br> Click on{" "}
+                                    <strong>Go to SplitIt to check</strong>
+                                </div>
+                            ) : (
+                                <div></div>
+                            )}
+                        </div>
+                        <div>
+                            <ModalPopup
+                                showModalPopup={this.state.showModalPopup}
+                                onPopupClose={this.isShowPopup}
+                                pendingResponse={this.state.pendingResponse}
+                                pathURL="http://127.0.0.1:8000/setTransferResponse/"
+                                amount={this.state.amount}
+                            ></ModalPopup>
+                        </div>
+                        <div style={{ display: "flex", padding: "5px 0" }}>
+                            <button className="button_primary" style={{ width: "95%" }}>
+                                <Link
+                                    to={{
+                                        pathname: "/splitIt",
+                                    }}
+                                >
+                                    Go to SplitIt
+                                </Link>
+                            </button>
+                            <button className="button_primary" style={{ width: "95%" }}>
+                                <Link
+                                    to={{
+                                        pathname: "/salarySplit",
+                                    }}
+                                >
+                                    Go to Salary Split
+                                </Link>
+                            </button>
+                        </div>
                     </div>
-                    <div>
-                        <ModalPopup
-                            showModalPopup={this.state.showModalPopup}
-                            onPopupClose={this.isShowPopup}
-                            pendingResponse={this.state.pendingResponse}
-                            pathURL="http://127.0.0.1:8000/setTransferResponse/"
-                            amount={this.state.amount}
-                        ></ModalPopup>
-                    </div>
-                    <div style={{ display: "flex", padding: "5px 0" }}>
-                        <button className="button_primary" style={{ width: "95%" }}>
-                            <Link
-                                to={{
-                                    pathname: "/splitIt",
-                                }}
-                            >
-                                Go to SplitIt
-                            </Link>
-                        </button>
-                        <button className="button_primary" style={{ width: "95%" }}>
-                            <Link
-                                to={{
-                                    pathname: "/salarySplit",
-                                }}
-                            >
-                                Go to Salary Split
-                            </Link>
-                        </button>
-                    </div>
-                </div>
+                }
+
             </div>
         );
     }
