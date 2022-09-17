@@ -2,8 +2,10 @@ import { Component } from "react";
 import axios from "axios";
 import "../styles/lent.css";
 import LoadingSpinner from "./LoadingSpinner";
+import Header from "./header";
 import ModalPopup from "../Models/modal-popup";
 import { connect } from "react-redux";
+import { Link, Navigate } from "react-router-dom";
 import {
   updateTransaction,
   updateCompletedMerchantPayment, setLoggedInCustomer
@@ -100,7 +102,8 @@ class Lent extends Component {
     });
 
     this.setState(
-      { customerslist: responsecustomers, customerLoads: false },
+      // { customerslist: responsecustomers, customerLoads: false },
+      { customerslist: responsecustomers.filter((x) => x.id != this.FailedUser), customerLoads: false },
       () => {
         console.log("csutomers = ", this.state.customerslist);
       }
@@ -155,7 +158,34 @@ class Lent extends Component {
       console.log("mama gav mai dindora pitava do settle up fail ho gaya hai");
     }
   };
+  recordFailedPaymentToSplitIt = async () => {
+    var finalbody = [
+      {
+        source: this.state.selectedMerchant,
+        amount: parseFloat(this.state.amount),
+        destination: this.state.custId,
+        name: "Mohit",
+      },
+    ];
+    console.log("finalbody is ", finalbody);
+    const headers = {
+      "Content-Type": `application/json`,
+    };
 
+    const request = {
+      baseURL: "http://127.0.0.1:8000/transactionList/",
+      headers,
+      data: finalbody,
+      method: "post",
+    };
+    const response = await axios(request);
+    console.log(response.data);
+    if (response.status == 201 || response.status == 200) {
+      this.setState({
+        isSplitRecorded: true,
+      });
+    }
+  };
   isShowPopup = (status) => {
     this.setState({ showModalPopup: status });
   };
@@ -225,11 +255,32 @@ class Lent extends Component {
           ))
       );
     }
+    let promptToUpdateSplitIt;
+    if (
+      // this.state.isFailedUserInList &&
+      this.state.merchantPaymentStarted && this.props.isMerchantPaymentCompleted && this.state.showSettleUpResponse == "" && this.props.merchantPaymentMessage != "Payment Declined"
+    ) {
+      promptToUpdateSplitIt = (
+        <div className="transaction_list_wrapper">
+          <p>
+            You made a payment of {this.state.amount} for you friend
+            too
+          </p>
+          <p>Record a payment in SPLITIT?</p>
+          <button
+            className="button_primary"
+            onClick={this.recordFailedPaymentToSplitIt}
+          >
+            Record It
+          </button>
+        </div>
+      );
+    }
 
     let paymentStatusFinal;
     if (this.state.merchantPaymentStarted) {
       console.log("Sabki maa ka chiahfuilanhsdlzujkfchseuirdfnhcdnfgcnhd bnsd", this.props.isMerchantPaymentCompleted, this.props.merchantPaymentMessage)
-      if (!this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Declined") {
+      if (this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Declined" && !this.state.showSettleUpResponse) {
         paymentStatusFinal =
           (
             <div className="transaction_list_wrapper">
@@ -237,33 +288,75 @@ class Lent extends Component {
             </div>
           )
       }
-      else if (this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Succeeded") {
+      else if (this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Succeeded" && !this.state.settleUpResponseMassage && this.state.merchantPaymentStarted) {
         paymentStatusFinal = (<div className="transaction_list_wrapper">
           <p>Your payment was completed</p>
         </div>)
       }
     }
     return (
-      <div className="container" style={{ padding: "2rem", width: "60%" }}>
-        {clickedMerchant}
-        {finalamount}
-        {paymentStatusFinal}
-        <div>
-          <ModalPopup
-            showModalPopup={this.state.showModalPopup}
-            onPopupClose={this.isShowPopup}
-            pendingResponse={this.state.pendingResponse}
-            pathURL="http://127.0.0.1:8000/setTransferResponse/"
-            amount={this.state.amount}
-          ></ModalPopup>
-        </div>
-        {this.state.showSettleUpResponse ? (
-          <div className="transaction_list_wrapper">
-            {this.state.settleUpResponseMassage}
+      <div>
+        <Header />
+        {this.state.custId == "" || this.state.custId == null || this.state.custId == undefined
+          ? <div className="login-form">
+            <div>Please login</div>
+            <button className="button_primary" style={{ width: "95%" }}>
+              <Link
+                to={{
+                  pathname: "/login",
+                }}
+              >
+                Go to Login
+              </Link>
+            </button>
           </div>
-        ) : (
-          <div></div>
-        )}
+          :
+          <div className="container" style={{ padding: "2rem", width: "60%" }}>
+
+            {clickedMerchant}
+            {finalamount}
+            {paymentStatusFinal}
+            <div>
+              <ModalPopup
+                showModalPopup={this.state.showModalPopup}
+                onPopupClose={this.isShowPopup}
+                pendingResponse={this.state.pendingResponse}
+                pathURL="http://127.0.0.1:8000/setTransferResponse/"
+                amount={this.state.amount}
+              ></ModalPopup>
+            </div>
+            {this.state.showSettleUpResponse ? (
+              <div className="transaction_list_wrapper">
+                {this.state.settleUpResponseMassage}
+              </div>
+            ) : (
+              <div></div>
+            )}
+            {promptToUpdateSplitIt}
+            {console.log(
+              this.state.isSplitRecorded,
+              "afesddaw3ersdfcsrbjhkdfcuohbwecdbjhscdsjozxcnk juhsdjnkxjhvsuikzjd"
+            )}
+            {this.state.isSplitRecorded ? (
+              <div>
+                You split was recorded <br></br> Click on{" "}
+                <strong>Go to SplitIt to check</strong>
+              </div>
+            ) : (
+              <div></div>
+            )}
+            <div style={{ display: "flex", padding: "5px 0" }}>
+              <button className="button_primary" style={{ width: "100%" }}>
+                <Link
+                  to={{
+                    pathname: "/splitIt",
+                  }}
+                >
+                  Go to SplitIt
+                </Link>
+              </button>
+            </div>
+          </div>}
       </div>
     );
   }

@@ -26,6 +26,7 @@ class SalarySplit extends Component {
       buttonEnable: true,
       responseMessage: "",
       customerLoads: true,
+      custId:"",
     };
     this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
     this.makeRequest = this.makeRequest.bind(this);
@@ -100,6 +101,15 @@ class SalarySplit extends Component {
     this.setState({ showModalPopup: status });
   };
   async componentDidMount() {
+    this.setState(
+      {
+        custId: localStorage.getItem("custId"),
+      },
+      () => {
+        console.log(this.state.custId, "customer is inside split it ");
+        this.makeRequest();
+      }
+    );
     await this.makeRequest();
   }
 

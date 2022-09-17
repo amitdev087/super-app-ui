@@ -20,6 +20,7 @@ export default function Header() {
       <a href="/splitIt">Split It</a>
 
       <a href="/salarySplit"> Manage Salary</a>
+      <a href="/lend Money"> Lend Money</a>
 
       <a href="/login"  style={{ float: "right" }} onClick={logout}> Logout</a>
       {isLoggedOut ? <Navigate replace to="/login" /> : <div></div>}
