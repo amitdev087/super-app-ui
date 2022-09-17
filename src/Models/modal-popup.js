@@ -11,7 +11,7 @@ class ModalPopup extends Component {
     super(props);
     this.state = {
       showModal: false,
-      custId:"",
+      custId: "",
     };
 
     this.createAcceptRequest = this.createAcceptRequest.bind(this);
@@ -30,7 +30,7 @@ class ModalPopup extends Component {
     );
   }
 
-  isShowModal = async (status,statusAcceptOrDecline) => {
+  isShowModal = async (status, statusAcceptOrDecline) => {
     await this.createAcceptRequest(statusAcceptOrDecline);
     this.handleClose();
     this.setState({ showModal: status });
@@ -56,24 +56,21 @@ class ModalPopup extends Component {
     const response = await axios(request);
     console.log(response.data);
     if (response.status == 201 || response.status == 200 && this.props.pathURL == "http://127.0.0.1:8000/setTransferResponse/") {
+      if (this.props.pendingResponse.status == "accept") {
+        this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
+      }
+
+      else {
+        this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
+      }
+    } 
+    if ((response.status == 201 || response.status == 200) && this.props.pathURL == "http://127.0.0.1:8000/settleUpConfirm/") {
       this.getTransactions();
-      if(this.props.pendingResponse.status == "accept"){
+      console.log("sent by me 2");
+      if (response.data == "accept") {
         this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
       }
       else this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
-
-    } else {
-      this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
-    }
-    if (response.status == 201 || response.status == 200 && this.props.pathURL == "http://127.0.0.1:8000/settleUpConfirm/") {
-      this.getTransactions();
-      if(response.data == "accept"){
-        this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
-      }
-      else this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
-
-    } else {
-      this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
     }
   };
 
@@ -82,10 +79,10 @@ class ModalPopup extends Component {
       "Content-Type": `application/json`,
     };
     const finbody = {
-        custId : this.state.custId
+      custId: this.state.custId
     }
-    
-    console.log("*&*&*&*&**&**&*&*",finbody)
+
+    console.log("*&*&*&*&**&**&*&*", finbody)
     const request = {
       baseURL: "http://127.0.0.1:8000/transactionData/",
       headers,
@@ -124,7 +121,7 @@ class ModalPopup extends Component {
               <button
                 type="button"
                 className="button_primary"
-                onClick={() => this.isShowModal(true,"accept")}
+                onClick={() => this.isShowModal(true, "accept")}
               >
                 {" "}
                 Accept{" "}
@@ -133,7 +130,7 @@ class ModalPopup extends Component {
                 type="button"
                 className="button_primary"
                 color="red"
-                onClick={() => this.isShowModal(true,"decline")}
+                onClick={() => this.isShowModal(true, "decline")}
               >
                 Decline
               </button>
@@ -147,7 +144,7 @@ class ModalPopup extends Component {
 const mapStateToProps = (state) => {
   return {
     transactionGlobal: state.transaction.transactionList,
-    custId : state.transaction.custId
+    custId: state.transaction.custId
   };
 };
 export default connect(mapStateToProps, {
