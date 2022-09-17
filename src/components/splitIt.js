@@ -39,10 +39,6 @@ class SplitIt extends Component {
       settleUpResponseMassage: "",
       showSettleUpResponse: false,
       merchantPaymentStarted: false,
-      // you owe people - split equally -- 1
-      // people owe you - split equally -- 2
-      // you owe people full amount -- 3
-      // people owe you full amount -- 4
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -126,8 +122,7 @@ class SplitIt extends Component {
     response.data["data"].forEach((element) => {
       var customer = element;
       if (
-        customer.ewallet != "" //&&
-        // customer.id != "cus_5dedc9d323b7928b256317886173bbca"
+        customer.ewallet != ""
       ) {
         responsecustomers.push(customer);
       }
@@ -166,7 +161,6 @@ class SplitIt extends Component {
     }
   }
   handlesettleUp = (e) => {
-    //const { value, checked } = e.target;
     var data = e.target.value;
     var transactionData = this.props.transactionGlobal.filter(
       (x) => x.source == data
@@ -365,7 +359,6 @@ class SplitIt extends Component {
     let button;
     if (this.state.selectedIds.length > 0) {
       this.buttonEnable = true;
-      // button = <button className='button_primary' onClick={this.createSplit}> Split It!{this.isLoading? <LoadingSpinner/>:} </button>;
     }
     if (this.buttonEnable) {
       button = (
@@ -379,7 +372,6 @@ class SplitIt extends Component {
       );
     }
     let finalamount;
-    // if (this.state.amount > 0) {
 
     if (this.state.selectedUserToPay != "") {
       finalamount = (
@@ -422,7 +414,6 @@ class SplitIt extends Component {
         </div>)
       }
     }
-    // }
     return (
       <div><Header />
         {this.state.custId == "" || this.state.custId == null || this.state.custId == undefined

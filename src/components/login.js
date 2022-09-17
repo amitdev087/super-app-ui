@@ -51,20 +51,17 @@ class Login extends Component {
   };
 
   handleSubmit = (event) => {
-    //Prevent page reload
     event.preventDefault();
 
     var { uname, pass } = document.forms[0];
     this.userLogin(uname.value, pass.value);
   };
 
-  // Generate JSX code for error message
   renderErrorMessage = (name) =>
     name === this.state.errorMessages && (
       <div className="error">{this.state.errorMessages.message}</div>
     );
 
-  // JSX code for login form
 
   render() {
     let renderForm = (

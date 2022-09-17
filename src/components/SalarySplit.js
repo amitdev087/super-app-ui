@@ -33,14 +33,10 @@ class SalarySplit extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.createSalaryGroup = this.createSalaryGroup.bind(this);
     this.handleClickAmount = this.handleClickAmount.bind(this);
-    // this.makeMerchantRequest = this.makeMerchantRequest.bind(this);
-    //this.handleClickMerchant = this.handleClickMerchant.bind(this);
-    //this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
     this.isShowPopup = this.isShowPopup.bind(this);
   }
   owingList = ["Split Salary Equally", "Pay Salary Indiviually "];
   handleClickOwingOption = (e) => {
-    //e.preventDefault();
     this.setState(
       {
         owingOption: e.target.value,

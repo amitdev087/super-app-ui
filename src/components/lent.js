@@ -50,7 +50,6 @@ class Lent extends Component {
     this.handleClickMerchant = this.handleClickMerchant.bind(this);
     this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
     this.isShowPopup = this.isShowPopup.bind(this);
-    // this.cl = this.makePaymentEwallet.bind(this);
   }
 
   handleChange = (e) => {
@@ -74,7 +73,6 @@ class Lent extends Component {
       () => {
       }
     );
-    // await this.makeMerchantRequest();
     await this.makeRequest();
   }
   async makeRequest() {
@@ -97,7 +95,6 @@ class Lent extends Component {
     });
 
     this.setState(
-      // { customerslist: responsecustomers, customerLoads: false },
       { customerslist: responsecustomers.filter((x) => x.id != this.FailedUser), customerLoads: false },
       () => {
       }
@@ -203,7 +200,6 @@ class Lent extends Component {
       <button
         className="button_primary"
         onClick={this.makePaymentEwallet}
-      // disabled={  this.state.selectedIds.length < 3}
       >
         {"Make Payment"}
       </button>
@@ -242,7 +238,6 @@ class Lent extends Component {
     }
     let promptToUpdateSplitIt;
     if (
-      // this.state.isFailedUserInList &&
       this.state.merchantPaymentStarted && this.props.isMerchantPaymentCompleted && this.state.showSettleUpResponse == "" && this.props.merchantPaymentMessage != "Payment Declined"
     ) {
       promptToUpdateSplitIt = (

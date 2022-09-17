@@ -15,7 +15,6 @@ import {
     setLoggedInCustomer,
 } from "../Redux/Actions/TransactionsActions";
 import LoadingSpinner from "./LoadingSpinner";
-// import AsyncStorage from "@react-native-community/async-storage";
 
 class ListCustomers extends Component {
     constructor(props) {
@@ -436,7 +435,6 @@ class ListCustomers extends Component {
                         : "Please select merchant "}
             </button>
         );
-        // }
         let finalamount;
         if (this.state.amount > 0) {
             if (
@@ -498,11 +496,6 @@ class ListCustomers extends Component {
                 </div>
             );
         }
-        // if(this.props.isMerchantPaymentCompleted){
-        //   <button>
-        //     Create Refund
-        //   </button>
-        // };
 
         return (
             <div>
@@ -619,8 +612,6 @@ const mapStateToProps = (state) => {
     return {
         isMerchantPaymentCompleted: state.transaction.isMerchantPaymentCompleted,
         merchantPaymentMessage: state.transaction.merchantPaymentMessage,
-        // loggedInUser: state.transaction.custId,
-        // custId: state.transaction.custId
     };
 };
 export default connect(mapStateToProps, {
