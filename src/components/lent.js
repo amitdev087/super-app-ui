@@ -2,6 +2,12 @@ import { Component } from "react";
 import axios from "axios";
 import "../styles/lent.css";
 import LoadingSpinner from "./LoadingSpinner";
+import ModalPopup from "../Models/modal-popup";
+import { connect } from "react-redux";
+import {
+  updateTransaction,
+  updateCompletedMerchantPayment, setLoggedInCustomer
+} from "../Redux/Actions/TransactionsActions";
 class Lent extends Component {
   constructor(props) {
     super(props);
@@ -32,10 +38,17 @@ class Lent extends Component {
       isSplitRecorded: false,
       customerLoads: true,
       custId: "",
+      settleUpResponseMassage: "",
+      showSettleUpResponse: false,
     };
     this.FailedUser = "cus_616804c7789f0342bd7664a5fa78f3b9";
     this.handleClickAmount = this.handleClickAmount.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.makeRequest = this.makeRequest.bind(this);
+    this.handleClickMerchant = this.handleClickMerchant.bind(this);
+    this.makePaymentEwallet = this.makePaymentEwallet.bind(this);
+    this.isShowPopup = this.isShowPopup.bind(this);
+    // this.cl = this.makePaymentEwallet.bind(this);
   }
 
   handleChange = (e) => {
@@ -119,7 +132,7 @@ class Lent extends Component {
     };
 
     const request = {
-      baseURL: "http://127.0.0.1:8000/accountTransfer/",
+      baseURL: "http://127.0.0.1:8000/lentMoney/",
       headers,
       data: ewalletpaymentbody,
       method: "post",
@@ -127,12 +140,24 @@ class Lent extends Component {
 
     const response = await axios(request);
     console.log(response.data);
-    this.setState({ pendingResponse: response.data }, () => {
-      console.log(this.state.pendingResponse);
-    });
-    if ((response.status = 200)) {
+
+    if ((response.status = 201) && (response.data["message"] == "")) {
       this.isShowPopup(true);
+      this.setState({ pendingResponse: response.data }, () => {
+        console.log(this.state.pendingResponse);
+      });
     }
+    if (((response.status = 201) && (response.data["message"] != ""))) {
+      this.setState({
+        showSettleUpResponse: true,
+        settleUpResponseMassage: response.data["message"],
+      });
+      console.log("mama gav mai dindora pitava do settle up fail ho gaya hai");
+    }
+  };
+
+  isShowPopup = (status) => {
+    this.setState({ showModalPopup: status });
   };
 
   handleClickAmount = (e) => {
@@ -163,7 +188,7 @@ class Lent extends Component {
       <button
         className="button_primary"
         onClick={this.makePaymentEwallet}
-        // disabled={  this.state.selectedIds.length < 3}
+      // disabled={  this.state.selectedIds.length < 3}
       >
         {"Make Payment"}
       </button>
@@ -173,41 +198,85 @@ class Lent extends Component {
       if (
         this.state.customerLoads
           ? (finalamount = (
-              <div className="transaction_list_wrapper">
-                <LoadingSpinner />
-              </div>
-            ))
+            <div className="transaction_list_wrapper">
+              <LoadingSpinner />
+            </div>
+          ))
           : (finalamount = (
-              <div className="transaction_list_wrapper">
-                <h5>Select Friends</h5>
-                <hr></hr>
-                {/* <button onClick={this.makeRequest} label="Get customers">Get list of Friends</button> */}
-                <ul className="grid_listcustomers">
-                  {this.state.customerslist.map((customer) => (
-                    <label key={customer.id}>
-                      <input
-                        type="checkbox"
-                        name="lang"
-                        value={customer.id}
-                        onChange={this.handleClickMerchant}
-                      />{" "}
-                      {customer.name}
-                    </label>
-                  ))}
-                </ul>
-                <div>{button}</div>
-              </div>
-            ))
+            <div className="transaction_list_wrapper">
+              <h5>Select Friends</h5>
+              <hr></hr>
+              {/* <button onClick={this.makeRequest} label="Get customers">Get list of Friends</button> */}
+              <ul className="grid_listcustomers">
+                {this.state.customerslist.map((customer) => (
+                  <label key={customer.id}>
+                    <input
+                      type="radio"
+                      name="lang"
+                      value={customer.id}
+                      onChange={this.handleClickMerchant}
+                    />{" "}
+                    {customer.name}
+                  </label>
+                ))}
+              </ul>
+              <div>{button}</div>
+            </div>
+          ))
       );
     }
 
+    let paymentStatusFinal;
+    if (this.state.merchantPaymentStarted) {
+      console.log("Sabki maa ka chiahfuilanhsdlzujkfchseuirdfnhcdnfgcnhd bnsd", this.props.isMerchantPaymentCompleted, this.props.merchantPaymentMessage)
+      if (!this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Failed") {
+        paymentStatusFinal =
+          (
+            <div className="transaction_list_wrapper">
+              {this.props.merchantPaymentMessage}
+            </div>
+          )
+      }
+      else if (this.props.isMerchantPaymentCompleted && this.props.merchantPaymentMessage == "Payment Succeeded") {
+        paymentStatusFinal = (<div className="transaction_list_wrapper">
+          <p>Your payment was completed</p>
+        </div>)
+      }
+    }
     return (
       <div className="container" style={{ padding: "2rem", width: "60%" }}>
         {clickedMerchant}
         {finalamount}
+        {paymentStatusFinal}
+        <div>
+          <ModalPopup
+            showModalPopup={this.state.showModalPopup}
+            onPopupClose={this.isShowPopup}
+            pendingResponse={this.state.pendingResponse}
+            pathURL="http://127.0.0.1:8000/setTransferResponse/"
+            amount={this.state.amount}
+          ></ModalPopup>
+        </div>
+        {this.state.showSettleUpResponse ? (
+          <div className="transaction_list_wrapper">
+            {this.state.settleUpResponseMassage}
+          </div>
+        ) : (
+          <div></div>
+        )}
       </div>
     );
   }
 }
 
-export default Lent;
+const mapStateToProps = (state) => {
+  return {
+    isMerchantPaymentCompleted: state.transaction.isMerchantPaymentCompleted,
+    merchantPaymentMessage: state.transaction.merchantPaymentMessage,
+  };
+};
+export default connect(mapStateToProps, {
+  updateTransaction,
+  updateCompletedMerchantPayment,
+  setLoggedInCustomer,
+})(Lent);

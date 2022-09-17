@@ -60,7 +60,7 @@ class ModalPopup extends Component {
       if(this.props.pendingResponse.status == "accept"){
         this.props.updateCompletedMerchantPayment([true, "Payment Succeeded"]);
       }
-      else this.props.updateCompletedMerchantPayment([false, "Payment Declined"]);
+      else this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
 
     } else {
       this.props.updateCompletedMerchantPayment([false, "Payment Failed"]);
