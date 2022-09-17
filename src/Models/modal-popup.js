@@ -11,12 +11,23 @@ class ModalPopup extends Component {
     super(props);
     this.state = {
       showModal: false,
+      custId:"",
     };
 
     this.createAcceptRequest = this.createAcceptRequest.bind(this);
     this.isShowModal = this.isShowModal.bind(this);
     this.handleClose = this.handleClose.bind(this);
     this.getTransactions = this.getTransactions.bind(this);
+  }
+  componentDidMount() {
+    this.setState(
+      {
+        custId: localStorage.getItem("custId"),
+      },
+      () => {
+        console.log(this.state.custId, "customer is inside split it ");
+      }
+    );
   }
 
   isShowModal = async (status,statusAcceptOrDecline) => {
@@ -61,7 +72,7 @@ class ModalPopup extends Component {
       "Content-Type": `application/json`,
     };
     const finbody = {
-        custId : this.props.custId
+        custId : this.state.custId
     }
     
     console.log("*&*&*&*&**&**&*&*",finbody)

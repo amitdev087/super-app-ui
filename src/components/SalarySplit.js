@@ -144,7 +144,7 @@ class SalarySplit extends Component {
     var responsecustomers = [];
     response.data["data"].forEach((element) => {
       var customer = element;
-      if (customer.ewallet != "" && customer.id != this.props.custId) {
+      if (customer.ewallet != "" && customer.id != this.state.custId) {
         responsecustomers.push(customer);
       }
     });
