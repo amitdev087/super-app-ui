@@ -6,7 +6,10 @@ import { Button } from "react-bootstrap";
 import "react-bootstrap";
 import "../styles/splitit.css";
 import { connect } from "react-redux";
-import { updateTransaction, setLoggedInCustomer } from "../Redux/Actions/TransactionsActions";
+import {
+  updateTransaction,
+  setLoggedInCustomer,
+} from "../Redux/Actions/TransactionsActions";
 import LoadingSpinner from "./LoadingSpinner";
 
 class SplitIt extends Component {
@@ -30,7 +33,7 @@ class SplitIt extends Component {
       responseMessage: "",
       selectedUserToPay: "",
       settleUpAmount: "",
-      custId:"",
+      custId: "",
       // you owe people - split equally -- 1
       // people owe you - split equally -- 2
       // you owe people full amount -- 3
@@ -59,14 +62,16 @@ class SplitIt extends Component {
     this.setState({ showModalPopup: status });
   };
   componentDidMount() {
-    this.setState({
-      custId:localStorage.getItem('custId')
- },()=>{
-     console.log(this.state.custId,"customer is inside split it ")
-     this.getTransactions();
-    this.makeRequest();
-   })
-    
+    this.setState(
+      {
+        custId: localStorage.getItem("custId"),
+      },
+      () => {
+        console.log(this.state.custId, "customer is inside split it ");
+        this.getTransactions();
+        this.makeRequest();
+      }
+    );
   }
 
   async getTransactions() {
@@ -75,15 +80,15 @@ class SplitIt extends Component {
     };
 
     const finbody = {
-      custId: this.state.custId
-    }
+      custId: this.state.custId,
+    };
 
-    console.log(finbody,"get transaction list of logged in user")
+    console.log(finbody, "get transaction list of logged in user");
 
     const request = {
       baseURL: "http://127.0.0.1:8000/transactionData/",
       headers,
-      data : finbody,
+      data: finbody,
       method: "post",
     };
     const response = await axios(request);
@@ -159,12 +164,14 @@ class SplitIt extends Component {
     //const { value, checked } = e.target;
     console.log(e.target.value);
     var data = e.target.value;
-    var transactionData = this.props.transactionGlobal.filter((x) => x.source == data);
-    var finalData = {...transactionData[0]};
-    finalData.amount = (Math.abs(finalData.amount)).toFixed(1);
+    var transactionData = this.props.transactionGlobal.filter(
+      (x) => x.source == data
+    );
+    var finalData = { ...transactionData[0] };
+    finalData.amount = Math.abs(finalData.amount).toFixed(1);
     this.setState({
-      settleUpAmount: finalData.amount
-    })
+      settleUpAmount: finalData.amount,
+    });
     console.log(finalData);
     this.settleup(finalData);
     // console.log(checked,"inside handleSettle")
@@ -196,7 +203,7 @@ class SplitIt extends Component {
         amount: individualAmount,
         destination: this.state.selectedUserToPay,
         name: this.showName(x),
-        destinationName: this.showName(this.state.selectedUserToPay)
+        destinationName: this.showName(this.state.selectedUserToPay),
       };
       finalbody.push(individualBody);
     });
@@ -279,13 +286,15 @@ class SplitIt extends Component {
 
   checkSettleUp(sentAmount, sourceCustomer) {
     if (parseInt(sentAmount) < 0) {
-      return <button
-        className="button_primary"
-        value={sourceCustomer}
-        onClick={this.handlesettleUp}
-      >
-        settleUp
-      </button>
+      return (
+        <button
+          className="button_primary"
+          value={sourceCustomer}
+          onClick={this.handlesettleUp}
+        >
+          settleUp
+        </button>
+      );
     }
   }
 
@@ -302,28 +311,28 @@ class SplitIt extends Component {
     } else {
       showOrHideTransactions
         ? (transactionsSplit = (
-          <div className="transaction_list_wrapper">
-            <h2>Transaction List</h2>
-            <ul>
-              {this.props.transactionGlobal.map((transaction) => (
-                <li
-                  className="single_transaction"
-                  name="lang"
-                  value={transaction.source}
-                  onChange={this.handleChange}
-                >
-                  <p className="p">
-                    <strong>{transaction.name}</strong>{" "}
-                    {this.checkOwes(transaction.amount)}{" "}
-                    {Math.abs(transaction.amount).toFixed(2)} USD
-                  </p>
+            <div className="transaction_list_wrapper">
+              <h2>Transaction List</h2>
+              <ul>
+                {this.props.transactionGlobal.map((transaction) => (
+                  <li
+                    className="single_transaction"
+                    name="lang"
+                    value={transaction.source}
+                    onChange={this.handleChange}
+                  >
+                    <p className="p">
+                      <strong>{transaction.name}</strong>{" "}
+                      {this.checkOwes(transaction.amount)}{" "}
+                      {Math.abs(transaction.amount).toFixed(2)} USD
+                    </p>
 
-                  {this.checkSettleUp(transaction.amount, transaction.source)}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
+                    {this.checkSettleUp(transaction.amount, transaction.source)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
         : (transactionsSplit = <div></div>);
     }
     splitType = (
@@ -367,7 +376,11 @@ class SplitIt extends Component {
     }
     if (this.buttonEnable) {
       button = (
-        <button className="button_primary" onClick={this.createSplit} disabled={this.state.amount < 1 || this.state.amount == ""}>
+        <button
+          className="button_primary"
+          onClick={this.createSplit}
+          disabled={this.state.amount < 1 || this.state.amount == ""}
+        >
           {this.state.amount > 0 ? "Split It!" : "Please enter amount"}
         </button>
       );
@@ -382,7 +395,10 @@ class SplitIt extends Component {
           <h5>Select Friends</h5>
           <ul className="grid_listcustomers">
             {this.state.customerslist.map((customer) => (
-              <label key={customer.id} hidden={customer.id == this.state.selectedUserToPay}>
+              <label
+                key={customer.id}
+                hidden={customer.id == this.state.selectedUserToPay}
+              >
                 <input
                   type="checkbox"
                   name="lang"
@@ -446,7 +462,10 @@ class SplitIt extends Component {
 const mapStateToProps = (state) => {
   return {
     transactionGlobal: state.transaction.transactionList,
-    custId : state.transaction.custId
+    custId: state.transaction.custId,
   };
 };
-export default connect(mapStateToProps, { updateTransaction, setLoggedInCustomer })(SplitIt);
+export default connect(mapStateToProps, {
+  updateTransaction,
+  setLoggedInCustomer,
+})(SplitIt);
