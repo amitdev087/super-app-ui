@@ -488,7 +488,9 @@ class ListCustomers extends Component {
             );
         } else if (
             !this.state.isFailedUserInList &&
-            this.props.isMerchantPaymentCompleted
+            this.props.isMerchantPaymentCompleted &&
+            this.props.isMerchantPaymentCompleted &&
+            this.props.merchantPaymentMessage != "Payment Declined"
         ) {
             promptToUpdateSplitIt = (
                 <div className="transaction_list_wrapper">
