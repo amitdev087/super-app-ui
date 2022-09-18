@@ -23,7 +23,7 @@ root.render(
     <Router>
       <Routes>
         <Route index path="/" element={<ListCustomers />}></Route>
-        <Route path="/listcustomers" element={<ListCustomers />}></Route>
+        <Route path="/splitPay" element={<ListCustomers />}></Route>
         <Route path="/splitIt" element={<SplitIt />}></Route>
         <Route path="/salarySplit" element={<SalarySplit />}></Route>
         <Route path="/login" element={<Login />}></Route>

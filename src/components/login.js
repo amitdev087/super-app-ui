@@ -95,7 +95,7 @@ class Login extends Component {
             <div></div>
           )}
         </div>
-        {this.state.isLoggedIn ? <Navigate replace to="/listcustomers" /> : <div></div>}
+        {this.state.isLoggedIn ? <Navigate replace to="/splitPay" /> : <div></div>}
       </div>
     );
   }

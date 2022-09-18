@@ -13,7 +13,7 @@ export default function Header() {
   }
   return (
     <div class="topnav">
-      <a class="active" href="/listcustomers">
+      <a class="active" href="/splitPay">
         Split Pay
       </a>
 
