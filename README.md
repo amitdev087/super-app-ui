@@ -6,4 +6,4 @@
 2. Once cloned, run the command - **npm install**
 3. After installation run the command to start the project - **npm start**
 
-Reachout to us at achal20000@gmail.com OR amit087@gmail.com
+Reachout to us at achal20000@gmail.com OR amitdev087@gmail.com
